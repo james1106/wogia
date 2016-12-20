@@ -1,0 +1,5 @@
+/.settings/*.prefs
+/*.classpath
+/WebRoot/upload
+/.settings/org.eclipse.wst.common.project.facet.core.xml
+/WebRoot/contactUs

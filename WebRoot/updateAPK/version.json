@@ -1,0 +1,16 @@
+{
+    "apkUrl":"http://7xnfyf.com1.z0.glb.clouddn.com/wogia-1.1.5.2-publish.apk",
+    "size":"34.4M",
+	"appName":"沃加",
+	"changeLog":"
+	1.修复已知问题<br/>
+	2.APP现在启动更快了<br/>
+	",
+	"created_at":"2016-10-28",
+	"isForce":0,
+	"isAutoInstall":1,
+	"versionName":"1.1.5.2",
+	"updateTips":"更新",
+	"versionCode":"20",
+	"status":1
+}

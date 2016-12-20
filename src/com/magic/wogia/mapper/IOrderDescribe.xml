@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+ 
+ <mapper namespace="com.magic.wogia.mapper.IOrderDescribe">
+ 
+ 	<resultMap type="OrderDescribeBean" id="BaseDescribe">
+ 		<result column="id" property="id" javaType="java.lang.Integer"/>
+ 		<result column="expect_time" property="expectTime" javaType="java.util.Date"/>
+ 		<result column="content" property="content" javaType="java.lang.String"/>
+ 		<result column="type" property="type" javaType="java.lang.Integer"/>
+ 		<result column="order_id" property="orderId" javaType="java.lang.Integer"/>
+ 	</resultMap>
+ 	
+ 	
+ 	<insert id="addOrderDescribe">
+ 		insert into t_order_adddecript(expect_time,content,type,order_id) values (#{orderDescribe.expectTime},#{orderDescribe.content},#{orderDescribe.type},#{orderDescribe.orderId})
+ 	</insert>
+ 
+ 	<select id="queryByOrder" resultMap="BaseDescribe">
+ 		select * from t_order_adddecript where order_id=#{orderId}
+ 	</select>
+ 	
+ 	<!-- 根据项目id删除 -->
+ 	<delete id="deleteByProjectId">
+ 		DELETE FROM `t_order_adddecript` WHERE `order_id` IN
+ 		(SELECT o.`id` FROM `t_order` o WHERE o.`device_id` IN
+ 		(SELECT d.`id` FROM  `t_device` d WHERE d.`project_id` = #{projectId}))
+ 	</delete>
+ </mapper>

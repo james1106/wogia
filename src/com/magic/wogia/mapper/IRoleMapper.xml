@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.magic.wogia.mapper.IRoleMapper" >
+	
+	<resultMap type="RoleBean" id="BaseRole">
+		<result column="id" property="id"  javaType="java.lang.Integer"/>
+		<result column="role" property="role"  javaType="java.lang.String"/>
+		<result column="decript" property="decript"  javaType="java.lang.String"/>
+		<association property="powers" column="id" select="com.magic.wogia.mapper.IRolePowerMapper.findByRoleId"></association>
+	</resultMap>
+
+	<!-- 根据条件查询用户 -->	
+	<select id="findRole" resultType="RoleBean">
+		SELECT r.* FROM  t_role r,t_user u 
+		WHERE  u.`role_id`  <![CDATA[ < ]]> r.`id`
+		AND u.`id` = #{id}
+	</select>
+	
+	<select id="queryByUserId" resultMap="BaseRole">
+		SELECT r.* FROM  t_role r,t_user u 
+		WHERE  u.`role_id`  <![CDATA[ <= ]]> r.`id`
+		AND u.`id` = #{id}
+	</select>
+	
+</mapper>

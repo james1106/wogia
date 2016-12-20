@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.magic.wogia.mapper.INewsMapper">
+
+	<resultMap type="NewsBean" id="BaseNews">
+		<result column="id" property="id" javaType="java.lang.Integer"/>
+		<result column="title" property="title" javaType="java.lang.String"/>
+		<result column="content" property="content" javaType="java.lang.String"/>
+		<result column="introduction" property="introduction" javaType="java.lang.String"/>
+		<result column="imageUrl" property="imageUrl" javaType="java.lang.String"/>
+		<result column="reads" property="reads" javaType="java.lang.Integer"/>
+		<result column="isUrl" property="isUrl" javaType="java.lang.Integer"/>
+		<result column="linkUrl" property="linkUrl" javaType="java.lang.String"/>
+		<result column="createtime" property="createTime" javaType="java.util.Date"/>
+		<result column="updatetime" property="updateTime" javaType="java.util.Date"/>
+		<result column="user_id" property="userId" javaType="java.lang.Integer"/>
+		<result column="isBanner" property="isBanner" javaType="java.lang.Integer"/>
+		<result column="isValid" property="isValid" javaType="java.lang.Integer"/>
+		<result column="real_reads" property="realReads" javaType="java.lang.Integer"/>
+		<result column="real_name" property="userName" javaType="java.lang.String"/>
+	</resultMap>
+	
+	<insert id="addNews"  useGeneratedKeys="true" keyProperty="news.id" parameterType="NewsBean" >
+		insert into t_news(title,content,introduction,imageUrl,`reads`,isUrl,linkUrl,createtime,updatetime,user_id,isBanner)
+		values(#{news.title},#{news.content},#{news.introduction},#{news.imageUrl},#{news.reads},#{news.isUrl},#{news.linkUrl},
+		NOW(),NOW(),#{news.userId},#{news.isBanner})
+	</insert>
+	 
+	<select id="findById" resultMap="BaseNews">
+		select * from t_news where id=#{id}
+	</select>
+	<select id="findByType" resultMap="BaseNews">
+		select * from t_news n,t_user u where n.user_id=u.id and isValid=1  ORDER BY n.createtime DESC
+		<if test="limit != null">
+			limit #{limit},#{limitSize}
+		</if>
+	</select>
+	<select id="countNewsByType" resultType="java.lang.Integer">
+		select count(*) from t_news where typeId=#{typeId} and  isValid=1 
+	</select>
+	
+	
+	<update id="delNews" >
+		update t_news set isValid=0 where id=#{id}
+	</update>
+	
+	<update id="updateNews">
+	
+		update t_news set 
+		
+			<if test="news.title != null">
+				`title`=#{news.title},
+			</if>
+			<if test="news.content != null">
+				`content`=#{news.content},
+			</if>
+			<if test="news.introduction != null">
+				`introduction`=#{news.introduction},
+			</if>
+			<if test="news.imageUrl != null">
+				`imageUrl`=#{news.imageUrl},
+			</if>
+			<if test="news.reads != null">
+				`reads`=#{news.reads},
+			</if>
+			<if test="news.realReads != null">
+				real_reads=#{news.realReads},
+			</if>
+			<if test="news.isUrl != null">
+				`isUrl`=#{news.isUrl},
+			</if>
+			<if test="news.linkUrl != null">
+				`linkUrl`=#{news.linkUrl},
+			</if>
+			<if test="news.isBanner != null">
+				isBanner=#{news.isBanner},
+			</if>
+		`updatetime`= NOW()
+		 where id=#{news.id}
+	
+	</update>
+
+</mapper>

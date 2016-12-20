@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.magic.wogia.mapper.TestMapper" >
+
+
+	<select id="findAll1" resultType="com.magic.wogia.bean.Test">
+		SELECT * FROM  t_user
+	</select>
+	
+	<select id="findAll2" resultType="String">
+		select table_name from information_schema.tables where table_schema='magicBeansTest' and table_type='base table'
+	</select>
+</mapper>

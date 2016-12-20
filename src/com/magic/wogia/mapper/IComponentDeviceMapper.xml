@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.magic.wogia.mapper.IComponentDeviceMapper" >
+  <resultMap id="BaseResultMap" type="com.magic.wogia.bean.ComponentDeviceBean" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="component_id" property="componentId" jdbcType="BIGINT" />
+    <result column="component_name" property="componentName" jdbcType="BIGINT" />
+    <result column="device_id" property="deviceId" jdbcType="BIGINT" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="maintain_time" property="maintainTime" jdbcType="TIMESTAMP" />
+    <result column="replace_time" property="replaceTime" jdbcType="TIMESTAMP" />
+    <result column="life" property="life" jdbcType="INTEGER" />
+    <result column="describe" property="describe" jdbcType="VARCHAR" />
+    <result column="project_name" property="projectName" jdbcType="VARCHAR" />
+    <result column="project_id" property="projectId" jdbcType="BIGINT" />
+    <result column="project_address" property="projectAddress" jdbcType="BIGINT" />
+    <result column="device_name" property="deviceName" jdbcType="VARCHAR" />
+  </resultMap>
+  
+ 
+  
+  <select id="queryAll" resultMap="BaseResultMap">
+  	select `life`,`id`,`replace_time`,`device_id` from t_component_device
+  </select>
+  
+  <!-- 查询分区零件列表 -->
+  <select id="findComponentDevice" resultMap="BaseResultMap" parameterType="HashMap" >
+    select c.*,c1.component_name,p.project_name,d.device_name from 
+    `t_component_device` c,
+    `t_component` c1,
+    `t_device` d,
+    `t_project` p,
+    `t_estate` e,
+    `t_water_work` w,
+    `t_office` o,
+    `t_company` c2
+    <where>
+  		d.`project_id` = p.`id` AND
+		p.`estate_id` = e.`id` AND
+		e.`water_work_id` = w.`id` AND
+		w.`office_id` = o.`id` AND
+		o.`company_id` = c2.`id` AND
+		d.`id` = c.`device_id` AND
+    	c.`component_id` = c1.`id`
+   		<if test="userType == 1">
+			<!-- 片区公司员工 -->
+			AND c2.`id` = #{objectId} 
+		</if>
+		<if test="userType == 2">
+			<!-- 办事处员工 -->
+		 	AND	o.`id` = #{objectId}
+		</if>
+		<if test="userType == 3">
+			<!-- 水厂员工 -->
+			AND w.`id` = #{objectId}
+		</if>
+		<if test="userType == 4">
+			<!-- 物业员工 -->
+			AND e.`id` = #{objectId}
+		</if>
+    	<if test="deviceId != null">
+    		AND c.`device_id` = #{deviceId}
+    	</if>
+    	<if test="id != null">
+    		AND c.`id` = #{id,jdbcType=BIGINT}
+    	</if>
+    	<if test="componentName != null and componentName != ''">
+    		AND c1.`component_name` like '%${componentName}%'
+    	</if>
+    <!-- 	<if test="cityIds != null">
+    		AND p.`city_id` in 
+			<foreach collection="cityIds" item="parentId" open="(" close=")"
+			    separator=",">
+			    #{parentId}
+	    	</foreach>
+    	</if> -->
+    </where>
+    <if test="pageStart != null">
+		LIMIT #{pageStart}, #{pageSize}
+	</if>
+  </select>
+  
+  
+  <select id="maintainCalendar" resultMap="BaseResultMap" parameterType="HashMap">
+  	
+  	  select c.*,c1.component_name,p.project_name,p.project_address,p.id as projectId,d.device_name,di.supplier from 
+	    `t_component_device` c,
+	    `t_component` c1,
+	    `t_device` d LEFT JOIN t_device_information di ON di.device_id = d.id,
+	    `t_project` p,
+	    `t_estate` e,
+	    `t_water_work` w,
+	    `t_office` o,
+	    `t_company` c2
+	    <where>
+	  		d.`project_id` = p.`id` AND
+			p.`estate_id` = e.`id` AND
+			e.`water_work_id` = w.`id` AND
+			w.`office_id` = o.`id` AND
+			o.`company_id` = c2.`id` AND
+			d.`id` = c.`device_id` AND
+	    	c.`component_id` = c1.`id`
+	   		<if test="userType == 1">
+				<!-- 片区公司员工 -->
+				AND c2.`id` = #{objectId} 
+			</if>
+			<if test="userType == 2">
+				<!-- 办事处员工 -->
+			 	AND	o.`id` = #{objectId}
+			</if>
+			<if test="userType == 3">
+				<!-- 水厂员工 -->
+				AND w.`id` = #{objectId}
+			</if>
+			<if test="userType == 4">
+				<!-- 物业员工 -->
+				AND e.`id` = #{objectId}
+			</if>
+	    	<if test="deviceId != null">
+	    		AND c.`device_id` = #{deviceId}
+	    	</if>
+	    	<if test="id != null">
+	    		AND c.`id` = #{id,jdbcType=BIGINT}
+	    	</if>
+	    	<if test="componentName != null and componentName != ''">
+	    		AND c1.`component_name` like '%${componentName}%'
+	    	</if>
+	    	<if test="cityIds != null">
+	    		AND p.`city_id` in 
+				<foreach collection="cityIds" item="parentId" open="(" close=")"
+				    separator=",">
+				    #{parentId}
+		    	</foreach>
+	    	</if>
+	    </where>
+	    <if test="pageStart != null">
+			LIMIT #{pageStart}, #{pageSize}
+		</if>
+  </select>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <!-- 添加分区零件 -->
+  <insert id="addComponentDevice" parameterType="com.magic.wogia.bean.ComponentDeviceBean" >
+    insert into t_component_device (component_id, device_id, 
+      create_time, update_time, maintain_time, 
+      replace_time, life, `describe`
+      )
+    values (#{componentId}, #{deviceId},NOW(), NOW(), NOW(),#{replaceTime}, #{life}, #{describe}
+      )
+  </insert>
+ <!-- 更新分区零件信息 -->
+  <update id="updComponentDevice" parameterType="com.magic.wogia.bean.ComponentDeviceBean" >
+    update t_component_device
+    <set >
+   		update_time = NOW(),
+      <if test="componentId != null" >
+        component_id = #{componentId},
+      </if>
+     <!--  <if test="deviceId != null" >
+        device_id = #{deviceId,jdbcType=BIGINT},
+      </if> -->
+      <if test="maintainTime != null" >
+        maintain_time = #{maintainTime},
+      </if>
+      <if test="replaceTime != null" >
+        replace_time = #{replaceTime},
+      </if>
+      <if test="life != null" >
+        life = #{life},
+      </if>
+      <if test="describe != null" >
+        `describe` = #{describe},
+      </if>
+    </set>
+    where id = #{id}
+  </update>
+  
+  <update id="updMaintainTime">
+  		update t_component_device set
+  		replace_time = #{updateTime},
+  		maintain_time = #{updateTime}
+  		where id in
+  		<foreach collection="ids" item="id" open="(" close=")"
+	    separator=",">
+	    	#{id}
+	    </foreach>
+  </update>
+  
+  <!-- 删除分区零件 -->
+  <delete id="deleteByProjectId">
+  	DELETE FROM `t_component_device` WHERE `device_id` IN
+  	(SELECT id FROM  `t_device` d WHERE d.`project_id` = #{projectId})
+  </delete>
+  
+</mapper>

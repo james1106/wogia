@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.magic.wogia.mapper.IProjectApplyDetailsBeanMapper">
+	<resultMap id="BaseResultMap" type="com.magic.wogia.bean.ProjectApplyDetailsBean">
+		<id column="id" property="id" jdbcType="BIGINT" />
+		<result column="apply_id" property="applyId" jdbcType="BIGINT" />
+		<result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="front_power" property="frontPower" jdbcType="VARCHAR" />
+		<result column="after_power" property="afterPower" jdbcType="VARCHAR" />
+		<result column="front_money" property="frontMoney" jdbcType="VARCHAR" />
+		<result column="after_money" property="afterMoney" jdbcType="VARCHAR" />
+		<result column="maintenance_money" property="maintenanceMoney"
+			jdbcType="VARCHAR" />
+		<result column="next_pay_time" property="nextPayTime" jdbcType="TIMESTAMP" />
+	</resultMap>
+	
+	
+	<select id="findProjectApplyDetailsByApplyId" resultMap="BaseResultMap">
+		SELECT * FROM `t_project_apply_details` p WHERE p.`apply_id`=#{applyId} 
+		<if test="pageNum != null">
+			limit #{pageNum},#{pageSize}
+		</if>
+	</select>
+	
+	<select id="findNewestByApplyId" resultMap="BaseResultMap">
+		SELECT * FROM `t_project_apply_details` p WHERE p.`apply_id`= #{applyId} ORDER BY p.`id` DESC LIMIT 0,1
+	</select>
+	
+	<select id="findProjectApplyDetailsById" resultMap="BaseResultMap">
+		SELECT * FROM `t_project_apply_details` p WHERE p.`id` = #{id}
+	</select>
+	
+	<insert id="addProjectApplyDetails" parameterType="com.magic.wogia.bean.ProjectApplyDetailsBean">
+		insert into
+		t_project_apply_details (id, apply_id, create_time,
+		front_power,
+		after_power, front_money,
+		after_money, maintenance_money, next_pay_time
+		)
+		values (#{id,jdbcType=BIGINT}, #{applyId,jdbcType=BIGINT},
+		NOW(),
+		#{frontPower,jdbcType=VARCHAR}, #{afterPower,jdbcType=VARCHAR},
+		#{frontMoney,jdbcType=VARCHAR},
+		#{afterMoney,jdbcType=VARCHAR},
+		#{maintenanceMoney,jdbcType=VARCHAR},
+		#{nextPayTime,jdbcType=TIMESTAMP}
+		)
+	</insert>
+
+	<update id="updProjectApplyDetails" parameterType="com.magic.wogia.bean.ProjectApplyDetailsBean">
+		update t_project_apply_details
+		<set>
+			<if test="applyId != null">
+				apply_id = #{applyId,jdbcType=BIGINT},
+			</if>
+			<if test="frontPower != null">
+				front_power = #{frontPower,jdbcType=VARCHAR},
+			</if>
+			<if test="afterPower != null">
+				after_power = #{afterPower,jdbcType=VARCHAR},
+			</if>
+			<if test="frontMoney != null">
+				front_money = #{frontMoney,jdbcType=VARCHAR},
+			</if>
+			<if test="afterMoney != null">
+				after_money = #{afterMoney,jdbcType=VARCHAR},
+			</if>
+			<if test="maintenanceMoney != null">
+				maintenance_money = #{maintenanceMoney,jdbcType=VARCHAR},
+			</if>
+			<if test="nextPayTime != null">
+				next_pay_time = #{nextPayTime,jdbcType=TIMESTAMP},
+			</if>
+		</set>
+		where id = #{id,jdbcType=BIGINT}
+	</update>
+	
+	<!-- 删除专项服务具体内容 -->
+	<delete id="deleteByProjectId">
+		DELETE FROM `t_project_apply_details` WHERE `apply_id` IN
+		(SELECT id FROM  `t_project_apply` p WHERE  p.`project_id` = #{projectId})
+	</delete>
+</mapper>

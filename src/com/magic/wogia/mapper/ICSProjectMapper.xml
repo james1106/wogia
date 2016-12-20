@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.magic.wogia.mapper.ICSProjectMapper">
+
+	<resultMap type="CSProjectBean" id="BaseCS">
+		<result column="id" property="id" javaType="java.lang.Integer"/>
+		<result column="table_name" property="tableName" javaType="java.lang.String"/>
+		<result column="syn_time" property="synTime" javaType="java.util.Date"/>
+		<result column="status" property="status" javaType="java.lang.Integer"/>
+	</resultMap>
+	
+	<select id="queryAll" resultMap="BaseCS">
+		select * from t_cs_project 
+	</select>
+	
+	<select id="queryStatus" resultMap="BaseCS">
+		select * from t_cs_project c where c.status=0
+	</select>
+	
+	<insert id="batchAdd">
+		insert into t_cs_project (table_name,syn_time,`status`) values
+		<foreach collection="csps" item="cs" index="index" separator=",">
+			(#{cs.tableName},#{cs.synTime},${cs.status})
+		</foreach>
+	</insert>
+	
+	<update id="updateStatus" parameterType="CSProjectBean">
+		update t_cs_project set `status`=#{csBean.status} where id=#{csBean.id}
+	</update>
+
+	<!-- 根据项目id还原更新项目表状态 -->
+	<update id="updByProjectId">
+		UPDATE `t_cs_project` SET `status` = 0 WHERE id = 
+		(SELECT p.`cs_project_id` FROM `t_project` p WHERE p.`id`=#{projectId})
+	</update>
+</mapper>

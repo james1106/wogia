@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.magic.wogia.mapper.ICompanyMapper">
+
+	<resultMap type="CompanyBean" id="BaseCompany">
+		<result column="id" property="id" javaType="java.lang.Integer" />
+		<result column="company_name" property="companyName" javaType="java.lang.String" />
+		<result column="company_address" property="companyAddress"
+			javaType="java.lang.String" />
+		<result column="city_id" property="cityId" javaType="java.lang.Integer" />
+		<result column="state" property="state" javaType="java.lang.Integer" />
+		<result column="number" property="number" javaType="java.lang.String" />
+		<result column="name" property="cityName" javaType="java.lang.String" />
+	</resultMap>
+
+	<!-- 查询 -->
+	<select id="findCompany" resultMap="BaseCompany" parameterType="HashMap">
+		SELECT * FROM `t_company` c,citys c2
+		<where>
+			c.city_id = c2.id
+			<if test="id != null">
+				AND c.`id` = #{id}
+			</if>
+			<if test="companyName != null and companyName != ''">
+				AND c.`company_name`LIKE '%${companyName}%'
+			</if>
+			<if test="companyAddress != null and companyAddress != ''">
+				AND c.`company_address` LIKE '%${companyAddress}%'
+			</if>
+			<if test="cityId != null">
+				AND c.`city_id` = #{cityId}
+			</if>
+			<if test="number != null and number != ''">
+				AND c.`number` = #{number}
+			</if>
+		</where>
+		<if test="pageStart != null">
+			LIMIT #{pageStart}, #{pageSize}
+		</if>
+	</select>
+
+
+	<!-- 查询地区id  -->
+	<select id="findCityId" resultMap="BaseCompany">
+		SELECT * FROM `t_company` c 
+		<if test="roleId != 1">
+		WHERE id =
+		<choose>
+			<when test="roleId == 5 || roleId == 6 || roleId == 7">
+				(SELECT o.`company_id` FROM`t_office` o WHERE o.`id` =
+				<choose>
+					<when test="roleId == 6 || roleId == 7">
+						(SELECT w.`office_id` FROM `t_water_work` w WHERE w.`id` =
+						<choose>
+							<when test="roleId == 7">
+								(SELECT e.`water_work_id` FROM `t_estate` e WHERE e.`id` =
+								#{objectId})))
+							</when>
+							<otherwise>
+								#{objectId}))
+							</otherwise>
+						</choose>
+					</when>
+					<otherwise>
+						#{objectId})
+					</otherwise>
+				</choose>
+			</when>
+			<otherwise>
+				#{objectId}
+			</otherwise>
+		</choose>
+		</if>
+		 
+		
+
+	</select>
+
+
+
+
+
+	<!-- 新增片区 -->
+	<insert id="addCompany" parameterType="CompanyBean">
+		<selectKey resultType="java.lang.Integer" order="AFTER"
+			keyProperty="id">
+			SELECT LAST_INSERT_ID() AS ID
+		</selectKey>
+		INSERT INTO
+		`t_company`(`company_name`,`company_address`,`city_id`,`number`)
+		VALUES(#{companyName},#{companyAddress},#{cityId},#{number})
+	</insert>
+
+	<!-- 更新片区信息 -->
+	<update id="updCompany" parameterType="CompanyBean">
+		UPDATE `t_company`
+		<set>
+			<if test="companyName != null and companyName != ''">
+				`company_name`= #{companyName},
+			</if>
+			<if test="companyAddress != null and companyAddress != ''">
+				`company_address` = #{companyAddress},
+			</if>
+			<if test="cityId != null and cityId != ''">
+				`city_id` = #{cityId},
+			</if>
+			<if test="state != null">
+				state = #{state},
+			</if>
+			<if test="number != null">
+				number = #{number},
+			</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+
+	<select id="queryById" resultMap="BaseCompany">
+		select * from t_company where
+		id=#{id}
+	</select>
+
+</mapper>

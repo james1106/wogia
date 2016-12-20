@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.magic.wogia.mapper.IWaterWorkMapper">
+	<resultMap id="BaseWaterWork" type="com.magic.wogia.bean.WaterWorkBean">
+		<id column="id" property="id" javaType="java.lang.Integer" />
+		<result column="waterWork_name" property="waterworkName" javaType="java.lang.String" />
+		<result column="waterWork_address" property="waterworkAddress" javaType="java.lang.String" />
+		<result column="office_id" property="officeId" javaType="java.lang.Integer" />
+		<result column="state" property="state" javaType="java.lang.Integer" />
+		<result column="number" property="number" javaType="java.lang.String" />
+		<result column="office_name" property="officeName" javaType="java.lang.String" />
+		<result column="address_describe" property="addressDescribe" javaType="java.lang.String" />
+		<result column="water_url" property="waterUrl" javaType="java.lang.String" />
+	</resultMap>
+
+	<!-- 查询 -->
+	<select id="findWaterWork" resultMap="BaseWaterWork" parameterType="HashMap">
+		 SELECT * FROM t_water_work w,t_office o
+   		 <where>
+   		 		o.id = w.office_id
+   		 	<if test="companyId != null">
+   		 		<!-- 片区人员查询 -->
+   		 		AND w.office_id IN(SELECT o1.`id` FROM t_office o1 WHERE o1.`company_id` = #{companyId})
+   		 	</if>
+			<if test="officeId != null">
+				<!-- 办事处人员查询 -->
+				AND w.`office_id` = #{officeId}
+			</if>
+			<if test="id != null">
+				<!-- 查询自己所有水厂 -->
+				AND w.`id` = #{id} 
+			</if>
+			<if test="waterworkName != null and waterworkName != ''">
+				AND w.`waterWork_name`LIKE '%${waterworkName}%'
+			</if>
+			<if test="waterworkAddress != null and waterworkAddress != ''">
+				AND w.`waterWork_address` LIKE '%${waterworkAddress}%'
+			</if>
+			<if test="number != null and number != ''">
+				AND w.`number` = #{number}
+			</if>
+		</where>
+		<if test="pageStart != null">
+			LIMIT #{pageStart}, #{pageSize}
+		</if>
+	</select>
+	
+	<select id="findWaterByProId" resultMap="BaseWaterWork">
+		SELECT 
+		  w.*
+		FROM
+		  t_project p,
+		  t_company c,
+		  t_office o,
+		  t_estate e,
+		  `t_water_work` w
+		WHERE c.`id` = o.`company_id` 
+		  AND o.`id` = w.`office_id` 
+		  AND w.`id` = e.`water_work_id` 
+		  AND e.`id` = p.`estate_id`
+		  AND p.`id` = #{projectId}
+		GROUP BY w.id 
+	</select>
+	
+	
+	<!-- 添加水厂 -->
+	<insert id="addWaterWork" parameterType="WaterWorkBean">
+		<selectKey resultType="java.lang.Integer" order="AFTER"
+			keyProperty="id">
+			SELECT LAST_INSERT_ID() AS ID
+		</selectKey>
+		INSERT INTO t_water_work (waterWork_name, waterWork_address,office_id,number,water_url,address_describe)
+   		VALUES (#{waterworkName,jdbcType=VARCHAR}, #{waterworkAddress,jdbcType=VARCHAR},
+   		#{officeId,jdbcType=BIGINT},#{number},#{waterUrl},#{addressDescribe})
+	</insert>
+	
+	
+	<!-- 更新水厂信息 -->
+	<update id="updWaterWork" parameterType="WaterWorkBean">
+		UPDATE t_water_work
+	    <set >
+	      <if test="waterworkName != null" >
+	        waterWork_name = #{waterworkName,jdbcType=VARCHAR},
+	      </if>
+	      <if test="waterworkAddress != null" >
+	        waterWork_address = #{waterworkAddress,jdbcType=VARCHAR},
+	      </if>
+	      <if test="addressDescribe != null" >
+	        address_describe = #{addressDescribe},
+	      </if>
+	      <if test="officeId != null" >
+	        office_id = #{officeId,jdbcType=BIGINT},
+	      </if>
+	      <if test="state != null">
+	      	state = #{state},
+	      </if>
+	      <if test="waterUrl != null">
+	      	water_url = #{waterUrl},
+	      </if>
+	      <if test="number != null">
+	      	number = #{number},
+	      </if>
+	    </set>
+	    WHERE id = #{id,jdbcType=BIGINT}
+	</update>
+
+	<!-- 删除水厂 -->
+	<delete id="delWaterWork">
+		DELETE FROM t_water_work
+   		<where>
+   			<if test="id != null">
+   				id = #{id,jdbcType=BIGINT}
+	   		</if>
+	   		<if test="officeId != null">
+	   			AND office_id = #{officeId,jdbcType=BIGINT}
+	   		</if>
+   		</where>
+	</delete>
+	
+	<select id="queryById" resultMap="BaseWaterWork">
+		select * from t_water_work where id=#{id}
+	</select>
+</mapper>

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.magic.wogia.mapper.IEstateMapper" >
+  <resultMap id="BaseEstate" type="EstateBean" >
+    <id column="id" property="id" javaType="java.lang.Integer" />
+    <result column="estate_address" property="estateAddress" javaType="java.lang.String" />
+    <result column="estate_name" property="estateName" javaType="java.lang.String" />
+    <result column="water_work_id" property="waterWorkId" javaType="java.lang.Integer" />
+    <result column="state" property="state" javaType="java.lang.Integer" />
+    <result column="number" property="number" javaType="java.lang.String" />
+    <result column="waterWork_name" property="waterWorkName" javaType="java.lang.String" />
+  </resultMap>
+  
+  <select id="queryById" resultMap="BaseEstate">
+  	select * from t_estate where id=#{id}
+  </select>
+  
+  <!-- 查询 -->
+	<select id="findEstate" resultMap="BaseEstate" parameterType="HashMap">
+		SELECT * FROM `t_estate` e ,t_water_work w
+		<where>
+			w.id = e.water_work_id
+			<if test="companyId!=null">
+			<!-- 片区人员查询 -->
+				AND e.`water_work_id` IN
+				(SELECT w1.`id` FROM t_water_work w1 WHERE w1.`office_id` IN
+				(SELECT o1.`id` FROM t_office o1 WHERE o1.`company_id` = #{companyId})) 
+			</if>	
+			<if test="officeId != null">
+			<!-- 办事处人员查询 -->
+				AND e.`water_work_id` IN
+				(SELECT w1.`id` FROM t_water_work w1 WHERE w1.`office_id` = #{officeId}) 
+			</if>
+			<if test="waterWorkId != null">
+			<!-- 水厂人员查询 -->
+				AND e.`water_work_id` = #{waterWorkId}
+			</if>
+			<if test="id != null">
+			<!-- 查询自己所属物业 -->
+				AND e.`id` = #{id} 
+			</if>
+			<if test="estateName != null and estateName != ''">
+				AND e.`estate_name`LIKE '%${estateName}%'
+			</if>
+			<if test="estateAddress != null and estateAddress != ''">
+				AND e.`estate_address` LIKE '%${estateAddress}%'
+			</if>
+			<if test="number != null and number != ''">
+				AND e.`number` = #{number}
+			</if>
+		</where>
+		<if test="pageStart != null">
+			LIMIT #{pageStart}, #{pageSize}
+		</if>
+	</select>
+  
+ 	<!-- 新增物业 -->
+	<insert id="addEstate" parameterType="EstateBean">
+		<selectKey resultType="java.lang.Integer" order="AFTER"
+			keyProperty="id">
+			SELECT LAST_INSERT_ID() AS ID
+		</selectKey>
+		INSERT INTO `t_estate`(`estate_address`,`estate_name`,`water_work_id`,`number`) 
+		VALUES(#{estateAddress},#{estateName},#{waterWorkId},#{number})
+	</insert>
+  
+  <!-- 更新物业信息 -->
+	<update id="updEstate" parameterType="EstateBean">
+		UPDATE `t_estate`
+		<set>
+			 <if test="estateName != null and estateName != ''">
+				 `estate_name`= #{estateName},
+			 </if>
+			 <if test="estateAddress != null and estateAddress != ''">
+				 `estate_address` = #{estateAddress},
+			 </if>
+			 <if test="waterWorkId != null and waterWorkId != ''">
+				 `water_work_id` = #{waterWorkId},
+			 </if>
+			 <if test="state != null">
+		      	state = #{state},
+		     </if>
+			 <if test="number != null">
+		      	number = #{number},
+		     </if>
+		</set>
+		WHERE id = #{id}
+	</update>
+	
+	<!-- 删除物业  -->
+	<delete id="delEstate">
+		DELETE FROM t_estate
+   		<where>
+	   		<if test="id != null">
+	   			id = #{id}
+	   		</if>
+	   		<if test="waterWorkId != null">
+	   		 	AND `water_work_id` = #{waterWorkId}
+	   		</if>
+   		</where>
+   		
+	</delete>
+</mapper>

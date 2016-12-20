@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.magic.wogia.mapper.IMonitorDataMapper" >
+
+	
+	<select id="queryMonitorData" resultType="com.magic.wogia.bean.MonitorDataBean">
+		
+		select *  from ${tableName} ORDER BY Time desc limit 0,1
+		
+	</select>
+	
+	<select id="queryMonitorChart" resultType="com.magic.wogia.bean.MonitorDataBean">
+		SELECT * <!-- ,${te} -->
+			<if test="ysli != null">
+				,${ysli}
+			</if>
+		  from ${tableName} ORDER BY Time desc limit 0,10
+	</select>
+	
+	<select id="queryMonitorWater" resultType="com.magic.wogia.bean.MonitorDataBean">
+		select *
+		 from ${tableName} ORDER BY Time desc limit 0,1
+	</select>
+
+</mapper>

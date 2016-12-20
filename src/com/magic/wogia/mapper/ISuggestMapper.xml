@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.magic.wogia.mapper.ISuggestMapper">
+
+	<resultMap type="SuggestBean" id="BaseSuggest">
+		<result column="id" property="id" javaType="java.lang.Integer"/>
+		<result column="content" property="content" javaType="java.lang.String"/>
+		<result column="user_id" property="userId" javaType="java.lang.Integer"/>
+		<result column="create_time" property="createTime" javaType="java.util.Date"/>
+		<result column="real_name" property="userName" javaType="java.lang.String"/>
+	</resultMap>
+	
+	<insert id="add">
+		insert into t_suggest(content,user_id,create_time) values(#{suggest.content},#{suggest.userId},#{suggest.createTime})
+	</insert>
+
+	<select id="findSuggest" resultMap="BaseSuggest">
+		SELECT s.*,u.`real_name` FROM `t_suggest` s,t_user u WHERE u.`id` = s.`user_id`
+		<if test="pageNum != null">
+			LIMIT #{pageNum}, #{pageSize}
+		</if>
+	</select>
+</mapper>

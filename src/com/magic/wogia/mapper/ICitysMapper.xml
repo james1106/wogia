@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+
+<mapper namespace="com.magic.wogia.mapper.ICitysMapper" >
+  <resultMap id="BaseCitys" type="com.magic.wogia.bean.CitysBean" >
+
+    <result column="id" property="id" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="parent_id" property="parentId" jdbcType="INTEGER" />
+    <result column="short_name" property="shortName" jdbcType="VARCHAR" />
+    <result column="level_type" property="levelType" jdbcType="CHAR" />
+    <result column="city_code" property="cityCode" jdbcType="VARCHAR" />
+    <result column="zip_code" property="zipCode" jdbcType="VARCHAR" />
+    <result column="merger_name" property="mergerName" jdbcType="VARCHAR" />
+    <result column="lng" property="lng" jdbcType="VARCHAR" />
+    <result column="lat" property="lat" jdbcType="VARCHAR" />
+    <result column="pinyin" property="pinyin" jdbcType="VARCHAR" />
+  </resultMap>
+
+
+  <!-- 查询 -->
+  <select id="findCitys" resultMap="BaseCitys" parameterType="HashMap">
+  	SELECT * FROM `citys` c 
+		<where>
+			<if test="id != null">
+				c.`id` = #{id} 
+			</if>
+			<if test="name != null and name != ''">
+				AND c.`name`LIKE '%${name}%'
+			</if>
+			<if test="parentId != null">
+				AND c.`parent_id` = #{parentId}
+			</if>
+		</where>
+		<if test="pageStart != null">
+			LIMIT #{pageStart}, #{pageSize}
+		</if>
+  </select>
+  
+  <!-- 根据MergerName查询数据  -->
+  <select id="findByMergerName" resultMap="BaseCitys" parameterType="String">
+  	SELECT * FROM `citys` c WHERE c.`merger_name` = #{mergerName}
+  </select>
+  <!--  -->
+  <select id="findByParentId" resultType="Integer">
+ 		SELECT id FROM `citys` c WHERE parent_id in
+  	 <foreach collection="parentIds" item="parentId" open="(" close=")"
+	    separator=",">
+	    #{parentId}
+    </foreach>
+  </select>
+  <!--  -->
+  <select id="findById" resultMap="BaseCitys">
+ 		SELECT * FROM `citys` c WHERE id in
+  	 <foreach collection="ids" item="id" open="(" close=")"
+	    separator=",">
+	    #{id}
+    </foreach>
+    group by id
+  </select>
+  
+  <!--  -->
+  <select id="findCompanyCity" resultMap="BaseCitys">
+  	SELECT * FROM `citys` c1 WHERE c1.`id` IN (
+  	SELECT c2.`city_id` FROM `t_company` c2
+  	<where>
+  		<if test="companyId != null">
+	  		c2.id = #{companyId}
+	  	</if>
+  	</where>
+  	)
+  </select>
+  
+  
+  
+  	<select id="findProjectCityId" resultMap="BaseCitys" parameterType="HashMap">
+		SELECT c2.* FROM 
+			t_project p,t_company c1,t_office o,t_estate e ,`t_water_work` w,citys c2
+		WHERE 
+			c1.`id`=o.`company_id` AND 
+			o.`id` = w.`office_id` AND 
+			w.`id` = e.`water_work_id` AND   
+			e.`id` = p.`estate_id`  AND 
+			c2.`id` = p.`city_id` 
+			<if test="userType == 1">
+				<!-- 片区公司员工 -->
+				AND	c1.`id` = #{objectId} 
+			</if>
+			<if test="userType == 2">
+				<!-- 办事处员工 -->
+			 	AND	o.`id` = #{objectId}
+			</if>
+			<if test="userType == 3">
+				<!-- 水厂员工 -->
+				AND w.`id` = #{objectId}
+			</if>
+			<if test="userType == 4">
+				<!-- 物业员工 -->
+				AND e.`id` = #{objectId}
+			</if>
+	</select>
+  
+  
+  
+</mapper>

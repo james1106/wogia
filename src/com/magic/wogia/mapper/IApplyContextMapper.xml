@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.magic.wogia.mapper.IApplyContextMapper">
+
+	<resultMap type="ApplyContextBean" id="BaseApplyContext">
+		<result column="id" property="id" javaType="java.lang.Integer" />
+		<result column="context" property="context" javaType="java.lang.String" />
+	</resultMap>
+
+	<!-- 查询 -->
+	<select id="findApplyContext" resultMap="BaseApplyContext" parameterType="HashMap">
+		SELECT * FROM `t_apply_context`
+	</select>
+
+	<update id="updApplyContext" parameterType="ApplyContextBean">
+		UPDATE `t_apply_context` SET `context`= #{context} WHERE id =#{id}
+	</update>
+
+	<insert id="addApplyContext" parameterType="ApplyContextBean">
+		INSERT INTO `t_apply_context`(`context`) 
+		VALUES(#{context})
+	</insert>
+</mapper>

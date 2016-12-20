@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.magic.wogia.mapper.IOrderInfoMapper">
+
+	<resultMap type="OrderInfoBean" id="BaseOrderInfo">
+		<result column="id" property="id" javaType="java.lang.Integer"/>
+		<result column="order_id" property="orderId" javaType="java.lang.Integer"/>
+		<result column="to_user_id" property="toUserId" javaType="java.lang.Integer"/>
+		<result column="info_msg" property="infoMsg" javaType="java.lang.String"/>
+		<result column="order_number" property="orderNumber" javaType="java.lang.String"/>
+		<result column="create_time" property="createTime" javaType="java.util.Date"/>
+	</resultMap>
+	
+	<insert id="batchAddOrderInfo">
+		insert into t_order_info (order_id,to_user_id,info_msg,create_time,order_number) values
+		<foreach collection="infos" item="info" index="index" separator=",">
+			(#{info.orderId},#{info.toUserId},#{info.infoMsg},#{info.createTime},#{info.orderNumber})
+		</foreach>
+	</insert>
+	
+	<select id="queryInfoList" resultMap="BaseOrderInfo">
+		select id,order_id,to_user_id,info_msg,create_time,order_number from t_order_info where 1=1
+		<if test="userId != null">
+			and to_user_id = #{userId}
+		</if>
+		ORDER BY create_time DESC
+		<if test="limit != null">
+			limit #{limit},#{limitSize}
+		</if>
+	</select>
+	
+	<select id="countInfo" resultType="java.lang.Integer">
+		select count(*) from t_order_info where 1=1
+		<if test="userId != null">
+			and to_user_id = #{userId}
+		</if>
+		
+	</select>
+	
+	<!-- 根据项目id删除 -->
+ 	<delete id="deleteByProjectId">
+ 		DELETE FROM `t_order_info` WHERE `order_id` IN
+ 		(SELECT o.`id` FROM `t_order` o WHERE o.`device_id` IN
+ 		(SELECT d.`id` FROM  `t_device` d WHERE d.`project_id` = #{projectId}))
+ 	</delete>
+
+</mapper>

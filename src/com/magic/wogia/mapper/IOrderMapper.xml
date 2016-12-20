@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.magic.wogia.mapper.IOrderMapper">
+
+	<resultMap type="OrderBean" id="BaseOrder">
+		<result column="id" property="id" javaType="java.lang.Integer"/>
+		<result column="order_describe" property="orderDescribe" javaType="java.lang.String"/>
+		<result column="images" property="images" javaType="java.lang.String"/>
+		<result column="avatar" property="avatar" javaType="java.lang.String"/>
+		<result column="status" property="status" javaType="java.lang.Integer"/>
+		<result column="order_data" property="orderData" javaType="java.lang.String"/>
+		<result column="createtime" property="createTime" javaType="java.util.Date"/>
+		<result column="order_number" property="orderNumber" javaType="java.lang.String"/>
+		<result column="create_user_id" property="userId" javaType="java.lang.Integer"/>
+		<result column="isvalid" property="isValid" javaType="java.lang.Integer"/>
+		<result column="update_time" property="updateTime" javaType="java.util.Date"/>
+		<result column="tech_id" property="techId" javaType="java.lang.Integer"/>
+		<result column="order_type" property="orderType" javaType="java.lang.Integer"/>
+		<result column="device_id" property="deviceId" javaType="java.lang.Integer"/>
+		<result column="contacts_name" property="userName" javaType="java.lang.String"/>
+		<result column="contacts_phone" property="userPhone" javaType="java.lang.String"/>
+		<result column="supplier" property="supplier" javaType="java.lang.String"/>
+		<result column="component_id" property="componentId" javaType="java.lang.String"/>
+		<result column="service_id" property="serviceId" javaType="java.lang.Integer"/>		
+		<result column="service_check" property="serviceCheck" javaType="java.lang.Integer"/>
+		<result column="tech_check" property="techCheck" javaType="java.lang.Integer"/>
+		<result column="project_name" property="projectName" javaType="java.lang.String"/>
+		<result column="device_name" property="deviceName" javaType="java.lang.String"/>
+		<result column="project_address" property="projectAddress" javaType="java.lang.String"/>
+		<result column="techStatus" property="techStatus" javaType="java.lang.Integer"/>
+		<association property="tech" column="tech_id" select="com.magic.wogia.mapper.IUserMapper.queryByIdUserOrder"></association>
+		<association property="ocList" column="id" select="com.magic.wogia.mapper.IOrderCompoentMapper.findByOrderId"></association>
+		<association property="userBean" column="create_user_id" select="com.magic.wogia.mapper.IUserMapper.queryByIdUserOrder"></association>
+		
+	</resultMap>
+	
+	<select id="queryById" resultMap="BaseOrder">
+	SELECT o.*,p.project_name,u.avatar,d.device_name,p.project_address 
+	from t_order o LEFT JOIN t_device d ON d.id=o.device_id LEFT JOIN t_project p ON p.id=d.project_id,t_user u 
+	where u.`id` = o.`create_user_id` AND o.id=#{orderId}
+		
+	</select>
+	
+	<insert id="addOrder" useGeneratedKeys="true" keyProperty="order.id">
+		insert into t_order(order_describe,`images`,`status`,order_data,createtime,order_number,create_user_id,isvalid,update_time,tech_id,order_type,device_id,
+		contacts_name,contacts_phone,supplier,component_id,service_id,service_check,tech_check) values (#{order.orderDescribe},#{order.images},#{order.status},#{order.orderData},#{order.createTime},
+		#{order.orderNumber},#{order.userId},#{order.isValid},#{order.updateTime},#{order.techId},#{order.orderType},#{order.deviceId},#{order.userName},#{order.userPhone}
+		,#{order.supplier},#{order.componentId},#{order.serviceId},#{order.serviceCheck},#{order.techCheck})
+	</insert>
+	
+	<update id="updateOrder">
+		update t_order
+			<set>
+				<if test="order.orderDescribe != null">
+					order_describe=#{order.orderDescribe},
+				</if>
+				<if test="order.status != null">
+					`status`=#{order.status},
+				</if>
+				<if test="order.orderData != null">
+					order_data=#{order.orderData},
+				</if>
+				<if test="order.isValid != null">
+					`isvalid`=#{order.isValid},
+				</if>
+				<if test="order.updateTime != null">
+					update_time=#{order.updateTime},
+				</if>
+				<if test="order.techId != null">
+					tech_id=#{order.techId},
+				</if>
+				<if test="order.serviceId != null">
+					service_id=#{order.serviceId},
+				</if>
+				<if test="order.serviceCheck != null">
+					service_check=#{order.serviceCheck},
+				</if>
+				<if test="order.techCheck != null">
+					tech_check=#{order.techCheck},
+				</if>
+				<if test="order.techStatus != null">
+					techStatus=#{order.techStatus}
+				</if>
+			</set>
+		 where id=#{order.id}
+	</update>
+
+	<select id="queryOrder" resultMap="BaseOrder">
+		SELECT o.*,p.project_name,d.device_name,p.project_address from t_order o LEFT JOIN t_device d ON d.id=o.device_id LEFT JOIN t_project p ON p.id=d.project_id,t_user u where  1=1
+		
+		and u.id = o.create_user_id
+		<if test="status != null and techOrderFlag == null">
+			and o.`status`=#{status}
+		</if>
+		<if test="status != null and techOrderFlag != null">
+			<if test="status == 2001">
+				and o.`status`=2002 and o.tech_check=0
+			</if>
+			<if test="status == 2002">
+				and o.`status`=2002 and o.tech_check=1
+			</if>
+			<if test="status != 2001 and status != 2002">
+				and o.`status`=#{status}
+			</if>
+		</if>
+		<!-- <if test="user.roleId != null and user.roleId=3 ">
+			
+		</if> -->
+		<if test="realName != null and realName != ''">
+			and u.real_name like '%${realName}%'
+		</if>
+		<if test="orderNumber != null and orderNumber != ''">
+			and o.`order_number` like '%${orderNumber}%'
+		</if>
+		<if test="orderType != null">
+			and o.order_type=#{orderType}
+		</if>
+		<if test="orderType == null and status == null">
+			and o.`status` != 2004
+		</if>
+		<if test="user != null and user.idType != null">
+			<if test="user.idType == 1">
+				<!-- 片区公司员工 -->
+				<if test="user.roleId != null and user.roleId == 3">
+					and o.tech_id=#{user.id}
+				</if>
+				and o.device_id IN( SELECT id from t_device WHERE project_id IN ( SELECT id from t_project WHERE estate_id IN
+				 (SELECT id FROM t_estate WHERE water_work_id IN (SELECT id FROM t_water_work WHERE office_id IN
+				  (SELECT id FROM t_office where company_id = #{user.companyId})))))
+			</if>
+			<if test="user.idType == 2">
+				<!-- 办事处员工 -->
+				and o.device_id IN( SELECT id from t_device WHERE project_id IN ( SELECT id from t_project WHERE estate_id IN
+				 (SELECT id FROM t_estate WHERE water_work_id IN (SELECT id FROM t_water_work WHERE office_id = #{user.companyId}))))
+			</if>
+			<if test="user.idType == 3">
+				<!-- 水厂员工 -->
+				and o. create_user_id=#{user.id} and device_id IN( SELECT id from t_device WHERE project_id IN ( SELECT id from t_project WHERE estate_id IN
+				 (SELECT id FROM t_estate WHERE water_work_id = #{user.companyId})))
+			</if>
+			<if test="user.idType == 4">
+				<!-- 物业员工 -->
+				and o.create_user_id=#{user.id}  and device_id IN( SELECT id from t_device WHERE project_id IN ( SELECT id from t_project WHERE estate_id = #{user.companyId}))
+			</if>
+		</if>
+		
+		ORDER BY o.createtime DESC 
+		<if test="limit != null">
+			limit #{limit},#{limitSize}
+		</if>
+		
+	</select>
+
+
+	<!-- 删除订单 根据项目id -->
+	<delete id="deleteByProjectId">
+		DELETE FROM `t_order` WHERE `device_id` IN
+		(SELECT id FROM  `t_device` d WHERE d.`project_id` = #{projectId})
+	</delete>
+
+
+
+
+
+
+</mapper>

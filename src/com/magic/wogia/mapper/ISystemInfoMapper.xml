@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.magic.wogia.mapper.ISystemInfoMapper">
+
+	<resultMap type="SystemInfoBean" id="BaseSystemInfo">
+		<result column="id" property="id" javaType="java.lang.Integer"/>
+		<result column="to_group" property="toGroup" javaType="java.lang.Integer"/>
+		<result column="title" property="title" javaType="java.lang.String"/>
+		<result column="create_time" property="createTime" javaType="java.util.Date"/>
+		<result column="content" property="content" javaType="java.lang.String"/>
+		<result column="brief" property="brief" javaType="java.lang.String"/>
+		<result column="publisher_id" property="publisherId" javaType="java.lang.Integer"/>
+		<result column="real_name" property="publisherName" javaType="java.lang.String"/>
+		<result column="type" property="type" javaType="java.lang.Integer"/>
+		<result column="to_user" property="toUser" javaType="java.lang.Integer"/>
+		
+	</resultMap>
+	
+	<insert id="batchAdd" >
+		insert into t_system_info(title,create_time,content,brief,publisher_id,type,to_user)  values
+		<foreach collection="infos" item="system" index="index" separator=",">
+			(#{system.title},#{system.createTime},#{system.content},#{system.brief},#{system.publisherId},#{system.type},#{system.toUser})
+		</foreach>
+	
+	</insert>
+	
+	<insert id="addSystemInfo" useGeneratedKeys="true" keyProperty="system.id">
+		insert into t_system_info(title,create_time,content,brief,publisher_id,type,to_user) 
+		values (#{system.title},#{system.createTime},#{system.content},#{system.brief},#{system.publisherId},#{system.type},#{system.toUser})
+	</insert>
+	
+	<select id="queryInfoPage" resultMap="BaseSystemInfo">
+		select * from t_system_info s,t_user u
+		<where>
+			s.publisher_id = u.id
+			<if test="userId != null">
+				or (s.to_user = #{userId} and s.type=2)
+			</if>
+			<!-- <if test="type != null">
+				and s.type=#{type}		
+			</if> -->
+		</where>
+		GROUP BY s.`id`
+		ORDER BY create_time DESC
+		<if test="limit != null">
+			limit #{limit},#{limitSize}
+		</if>
+	</select>
+
+
+
+	<select id="countSystemInfo" resultType="java.lang.Integer">
+		select count(*) from t_system_info
+	</select>
+	
+	<select id="findById" resultMap="BaseSystemInfo" >
+		select * from t_system_info where id=#{id}
+	</select>
+	
+	<delete id="delSystemInfo">
+		delete from t_system_info where id=#{id}
+	</delete>
+	
+	<update id="updateSystemInfo">
+		update t_system_info 
+		<set>
+			<if test="info.title != null">
+				title=#{info.title},
+			</if>
+			<if test="info.content != null">
+				content=#{info.content},
+			</if>
+			<if test="info.brief != null">
+				brief=#{info.brief},
+			</if>
+			<if test="info.type != null">
+				type = #{info.type}
+			</if>
+		</set>
+		where id=#{info.id}
+	</update>
+	
+</mapper>

@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.magic.wogia.mapper.IDeviceMapper">
+	<resultMap id="BaseDevice" type="com.magic.wogia.bean.DeviceBean">
+		<id column="id" property="id" jdbcType="BIGINT" />
+		<result column="device_name" property="deviceName" jdbcType="VARCHAR" />
+		<result column="device_type" property="deviceType" jdbcType="INTEGER" />
+		<result column="table_device" property="tableDevice" jdbcType="VARCHAR" />
+		<result column="device_createtime" property="deviceCreatetime" jdbcType="TIMESTAMP" />
+		<result column="project_id" property="projectId" jdbcType="BIGINT" />
+		<result column="project_name" property="projectName" jdbcType="VARCHAR" />
+		<result column="water_img" property="waterImg" javaType="java.lang.String" />
+		<result column="supplier" property="supplier" javaType="java.lang.String" />
+	</resultMap>
+	
+	
+	<select id="queryByProject" resultMap="BaseDevice">
+		SELECT d.id, d.device_name,d.device_createtime,p.project_name as project_name,d.table_device  from t_device d,t_project p 
+		WHERE d.project_id=p.id AND project_id=#{projectId}
+	</select>
+	
+	<select id="queryByProjectId" resultMap="BaseDevice">
+		SELECT d.* from t_device d,t_component_device c WHERE d.id=c.device_id AND d.project_id=#{projectId} AND c.id IN 
+		<foreach collection="comIds" item="id" index="index" separator="," close=")" open="(">
+		 		#{id}
+		 </foreach>
+	</select>
+	
+	
+	<!-- 查询设备  -->
+
+	<select id="findDevice" resultMap="BaseDevice" parameterType="HashMap">
+		select d.*,p.project_name,di.`supplier`  
+		from t_device d LEFT JOIN  t_device_information di ON di.`device_id` = d.`id`,
+		t_project p,`t_estate` e,`t_water_work` w,`t_office` o,`t_company` c
+		<where>
+			d.`project_id` = p.`id` AND
+			p.`estate_id` = e.`id` AND
+			e.`water_work_id` = w.`id` AND
+			w.`office_id` = o.`id` AND
+			o.`company_id` = c.`id` 
+			<if test="userType == 1">
+				<!-- 片区公司员工 -->
+				AND c.`id` = #{objectId} 
+			</if>
+			<if test="userType == 2">
+				<!-- 办事处员工 -->
+			 	AND	o.`id` = #{objectId}
+			</if>
+			<if test="userType == 3">
+				<!-- 水厂员工 -->
+				AND w.`id` = #{objectId}
+			</if>
+			<if test="userType == 4">
+				<!-- 物业员工 -->
+				AND e.`id` = #{objectId}
+			</if>
+			<if test="id != null">
+				AND d.`id` = #{id} 
+			</if>
+			<if test="deviceName != null and deviceName != ''">
+				AND d.`device_name`LIKE '%${deviceName}%'
+			</if>
+			<if test="deviceType != null and deviceType != ''">
+				AND d.`device_type` LIKE '%${deviceType}%'
+			</if>
+			<if test="tableDevice != null and tableDevice != ''">
+				AND d.`table_device` LIKE '%${tableDevice}%'
+			</if>
+			<if test="projectId != null">
+				AND d.`project_id` = #{projectId}
+			</if>
+		</where>
+		<if test="pageStart != null">
+			LIMIT #{pageStart}, #{pageSize}
+		</if>
+	</select>
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+		delete from t_device
+		where id = #{id,jdbcType=BIGINT}
+	</delete>
+	<insert id="addDevice" parameterType="com.magic.wogia.bean.DeviceBean">
+		insert into t_device (device_name, device_type,
+		table_device, device_createtime, project_id
+		)
+		values (#{deviceName,jdbcType=VARCHAR}, #{deviceType,jdbcType=INTEGER},
+		#{tableDevice,jdbcType=VARCHAR},
+		NOW(), #{projectId,jdbcType=BIGINT}
+		)
+	</insert>
+
+	<update id="updDevice" parameterType="com.magic.wogia.bean.DeviceBean">
+		update t_device
+		<set>
+			<if test="deviceName != null">
+				device_name = #{deviceName,jdbcType=VARCHAR},
+			</if>
+			<if test="deviceType != null">
+				device_type = #{deviceType,jdbcType=INTEGER},
+			</if>
+			<if test="tableDevice != null">
+				table_device = #{tableDevice,jdbcType=VARCHAR},
+			</if>
+			<if test="deviceCreatetime != null">
+				device_createtime = #{deviceCreatetime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="projectId != null">
+				project_id = #{projectId,jdbcType=BIGINT},
+			</if>
+			<if test="waterImg != null">
+				water_img = #{waterImg},
+			</if>
+		</set>
+		where id = #{id,jdbcType=BIGINT}
+	</update>
+	
+	<!-- 根据项目id删除分区 -->
+	<delete id="deleteByProjectId">
+		DELETE FROM `t_device` WHERE project_id = #{projectId}
+	</delete>
+</mapper>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.magic.wogia.mapper.IRolePowerMapper">
+
+
+	<resultMap type="RolePowerBean" id="BaseRolePower">
+	
+		<result column="id" property="id" javaType="java.lang.Integer"/>
+		<result column="role_id" property="roleId" javaType="java.lang.Integer" />
+		<result column="permission_id" property="powerId" javaType="java.lang.Integer" />
+		<!-- <association property="role" column="role_id" select="com.magic.sangha.mapper.IRoleMapper.findById"></association> -->
+		<association property="power" column="permission_id" select="com.magic.wogia.mapper.IPermissionMapper.findById"> </association>
+	</resultMap>
+
+
+	<select id="findByPowerId" resultMap="BaseRolePower">
+		select * from t_role_permission where permission_id=#{powerId}
+	</select>
+	
+	<select id="findByRoleId" resultMap="BaseRolePower">
+		select * from t_role_permission where role_id=#{roleId}
+	</select>
+	
+	<delete id="delRolePower">
+		delete from t_role_permission where role_id=#{roleId}
+	</delete>
+	
+	
+	<insert id="addBatch">
+		insert into t_role_permission (role_id,permission_id) values
+		<foreach collection="rolePowers" item="rolePower" index="index" separator=",">
+			(#{rolePower.roleId},#{rolePower.powerId})
+		</foreach>
+	</insert>
+	
+
+</mapper>

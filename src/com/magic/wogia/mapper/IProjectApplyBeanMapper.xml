@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.magic.wogia.mapper.IProjectApplyBeanMapper" >
+  <resultMap id="BaseResultMap" type="com.magic.wogia.bean.ProjectApplyBean" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="project_id" property="projectId" jdbcType="BIGINT" />
+    <result column="user_id" property="userId" jdbcType="BIGINT" />
+    <result column="apply_time" property="applyTime" jdbcType="TIMESTAMP" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+	<result column="project_name" property="projectName" jdbcType="VARCHAR" />
+	<result column="projectAddress" property="projectAddress" javaType="java.lang.String"/>
+	<result column="real_name" property="userName"  javaType="java.lang.String"/>
+  </resultMap>
+
+	<select id="batchQueryProjectApply" resultMap="BaseResultMap">
+		select pa.*,p.project_address as projectAddress from t_project_apply pa,t_project p where p.id=pa.project_id and pa.project_id in 
+		<foreach collection="ids" index="index" item="id" open="(" separator="," close=")" >
+  			#{id}
+  		</foreach>
+	</select>
+	
+	<insert id="add">
+		insert into t_project_apply(project_id,user_id,apply_time,`status`) values (#{projectApplyBean.projectId},#{projectApplyBean.userId},#{projectApplyBean.applyTime},#{projectApplyBean.status})
+	</insert>
+  
+ 	<select id="batchQueryProjectApplys" resultMap="BaseResultMap">
+		select pa.*,p.`project_name`,u.`real_name` 
+		from t_project_apply pa,
+ 			 t_project p,
+ 			 t_user u 
+		where 
+		p.`id` = pa.project_id AND
+		pa.`user_id` = u.`id` AND
+		pa.project_id in 
+		<foreach collection="ids" index="index" item="id" open="(" separator="," close=")" >
+  			#{id}
+  		</foreach>
+  		<if test="pageNum != null">
+  			limit #{pageNum},#{pageSize}
+  		</if>
+  		
+	</select>
+  
+ 	<update id="updProjectApply">
+ 		UPDATE `t_project_apply` SET `status` = 1 WHERE id = #{id}
+ 	</update> 
+ 	
+ 	<!-- 删除专项服务申请  根据项目id-->
+ 	<delete id="deleteByProjectId">
+ 		DELETE FROM `t_project_apply` WHERE `project_id` = #{projectId}
+ 	</delete>
+</mapper>

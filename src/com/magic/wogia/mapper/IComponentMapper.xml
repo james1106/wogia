@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.magic.wogia.mapper.IComponentMapper" >
+  <resultMap id="BaseResultMap" type="com.magic.wogia.bean.ComponentBean" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="component_name" property="componentName" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <select id="queryBatch" resultMap="BaseResultMap">
+  	
+  	SELECT id,component_name from t_component  where id IN ( SELECT component_id from t_component_device where id IN (#{ids}))
+  
+  </select>
+  
+  <select id="batchQueryById" resultMap="BaseResultMap">
+  		SELECT com.* from t_device d,t_component_device c,t_component com WHERE d.id=c.device_id AND d.id=#{deviceId} AND com.id=c.component_id and c.id IN
+  		<foreach collection="ids" item="id" index="index" separator="," close=")" open="(">
+		 		#{id}
+		 </foreach>
+  </select>
+  
+  <select id="findComponent" resultMap="BaseResultMap" parameterType="HashMap" >
+    select * from t_component
+    <where>
+   	 	<if test="componentName != null and componentName != ''" >
+        	component_name like '%${componentName}%'
+      	</if>
+      	<if test="id != null">
+      	  	AND id = #{id,jdbcType=BIGINT}
+      	</if>
+    </where>
+    <if test="pageStart != null">
+		LIMIT #{pageStart}, #{pageSize}
+	</if>
+  </select>
+  
+  <!-- 新增   -->
+  <insert id="addComponent" parameterType="com.magic.wogia.bean.ComponentBean" >
+    insert into t_component (component_name)
+    values (#{componentName,jdbcType=VARCHAR})
+  </insert>
+ 
+  <update id="updComponent" parameterType="com.magic.wogia.bean.ComponentBean" >
+    update t_component
+    <set >
+      <if test="componentName != null" >
+        component_name = #{componentName,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

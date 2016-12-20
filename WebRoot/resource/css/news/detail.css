@@ -1,0 +1,201 @@
+*{
+	font-family: "微软雅黑";
+}
+.mui-content{
+	display:none;
+}
+.mui-scroll{
+	padding: 10px 10px;
+}
+.mui-scroll .top-img img{
+	width: 100%;
+}
+.mui-scroll .title{
+	text-align: left;
+	font-size: 18px;
+	line-height: 26px;
+	color: #4D4D4D;
+	font-weight: bold;
+	margin-top: 20px;
+	padding: 0px 2px;
+}
+
+.introduction {
+	text-align: left;
+	padding: 0px 2px;
+	margin-top: 10px;
+}
+.introduction img{
+	display: none;
+	width: 40px;
+	margin-bottom: -3px;
+}
+.introduction span{
+	color: #8A8A8A;
+	font-size: 12px;
+	display: inline-block;
+	padding: 4px 6px;
+}
+.mui-scroll .content{
+	text-align: left;
+	color: #4E4E4E;
+	padding-left: 3px;
+	margin-top: 20px;
+	margin-bottom: 20px;
+}
+/*投票*/
+.vote,.vote-result{
+	display: none;
+}
+#button{
+	display:block ;
+	border:none;
+	margin: 0px auto;
+	width: 62px;
+	height: 63px;
+	background: url(/SanghaCloud/resource/img/2.png) no-repeat center center;
+	background-size: cover;
+}
+#button.checked{
+	background-image: url(/SanghaCloud/resource/img/4.png);
+}
+.vote ul.vote-item{
+	padding-left: 0px;
+	list-style: none;
+}
+.vote ul.vote-item li.item{
+	margin-top: 20px;
+}
+.vote ul.vote-item span{
+	font-size: 15px;
+}
+.vote ul.vote-item label{
+	margin-top:4px;
+	float: right;
+	width: 15px;
+	height: 15px;
+	display: inline-block;
+	background: url(/SanghaCloud/resource/img/3.png) no-repeat center right;
+	background-size: cover;
+}
+.vote ul.vote-item label.checked{
+	background-image: url(/SanghaCloud/resource/img/1.png);
+} 
+.vote-result ul.result{
+	list-style: none;
+	padding-left: 0px;
+}
+.vote-result ul.result li{
+	margin-top: 20px;
+}
+.vote-result ul.result li p{
+	margin-bottom: 0px;
+}
+.vote-result ul.result li .progress{
+	display: inline-block;
+	width: 200px;
+	height: 20px;
+	background:rgba(0,0,0,0.05);
+	position: relative;
+}
+.vote-result ul.result li .progressbar{
+	width: 100px;
+	height: 20px;
+	display: inline-block;
+	position: absolute;
+	top: 0px;
+	bottom: 0px;
+	background-color:#588FEB;
+}
+.vote-result ul.result li span{
+	display: inline-block;
+	float: right;
+	margin-top: -2px;
+	font-size: 15px;
+}
+.vote-result ul.result li span.voteNumber{
+	margin-right: 10px;
+}
+/*模态框*/
+.model{
+	display: none;
+	z-index:9999999;
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	background: rgba(1,1,1,0.5);
+}
+.model-dialog{
+	width: 280px;
+	position: absolute;
+	bottom: 28%;
+	left: 50%;
+	margin-left: -140px;
+}
+.model-content{
+	border: 1px solid #ddd;
+	border-radius: 5px;
+	background: #F2F2F2;
+	box-shadow: 0 0 6px #ddd;
+	position: relative;
+}
+.model-content a{
+	display: inline-block;
+	text-decoration: none;
+	width: 100%;
+	height: 50px;
+	line-height: 50px;
+	text-align: center;
+	color: #4D4D4D;
+	letter-spacing: 1px;
+}
+.model-content span{
+	position: absolute;
+	top: 0;
+	right: 6px;
+}
+/* 控制视频样式 */
+.mui-scroll .content video{
+	width:100%;
+	height:auto;
+}
+.mui-scroll .content img{
+	max-width:100%;
+}
+/*未选提示弹窗*/
+.confirm{
+	display:none;
+	position:fixed;
+	z-index:9999999;
+	top:0;
+	right:0;
+	bottom:0;
+	left:0;
+	background:rgba(0,0,0,0.2);
+	width: 100%;
+	height: 100%;
+}
+.confirm-dialog{
+	width:70%;
+	position:absolute;
+	top:35%;
+	left:50%;
+	margin-left:-35%;
+}
+.confirm-content{
+	border:1px solid #ddd;
+	border-radius:10px;
+	background:#fff;
+}
+.confirm ul{
+	margin:0px;
+	list-style:none;
+	padding-left:0px;
+	text-align:center;
+}
+.confirm ul li{
+	padding:8px 10px;
+	border-bottom:1px solid #ddd;
+}

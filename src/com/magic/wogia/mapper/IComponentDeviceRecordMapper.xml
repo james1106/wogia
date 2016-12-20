@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.magic.wogia.mapper.IComponentDeviceRecordMapper" >
+  	<resultMap id="BaseResultMap" type="com.magic.wogia.bean.ComponentDeviceRecordBean" >
+	    <id column="id" property="id" jdbcType="BIGINT" />
+	    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+	    <result column="user_id" property="userId" jdbcType="INTEGER" />
+		<result column="real_name" property="realName"  javaType="java.lang.String"/>
+    	<result column="type" property="type" jdbcType="INTEGER" />
+  	</resultMap>
+  	
+  	<!-- 查询维修/保养记录 -->
+  	<select id="findComponentDeviceRecord" resultMap="BaseResultMap" parameterType="HashMap" >
+	    select * from t_component_device_record c ,t_user u
+	    <where>
+	    	c.`user_id` = u.`id`
+	    	<if test="id != null">
+	    		c.`id` = #{id}
+	    	</if>
+	    	<if test="realName != null and realName != ''">
+	    		u.`realName` like '%${realName}%'
+	    	</if>
+	    	<if test="type != null">
+	    		c.`type` = #{type}
+	    	</if>
+	    </where>
+	    order by c.`create_time` desc
+	     <if test="pageStart != null">
+				LIMIT #{pageStart}, #{pageSize}
+		 </if>
+	  </select>
+  <!-- 新增维修/保养记录 -->
+  <insert id="addComponentDeviceRecord" parameterType="com.magic.wogia.bean.ComponentDeviceRecordBean" >
+    insert into t_component_device_record (create_time, user_id, 
+      type)
+    values (NOW(), #{userId,jdbcType=INTEGER}, 
+      #{type,jdbcType=INTEGER})
+  </insert>
+ <!-- 更新维修/保养记录 -->
+  <update id="updComponentDeviceRecord" parameterType="com.magic.wogia.bean.ComponentDeviceRecordBean" >
+    update t_component_device_record
+    <set >
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="userId != null" >
+        user_id = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="type != null" >
+        type = #{type,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  
+</mapper>

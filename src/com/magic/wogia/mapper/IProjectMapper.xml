@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.magic.wogia.mapper.IProjectMapper">
+	<resultMap id="BaseProject" type="com.magic.wogia.bean.ProjectBean">
+		<id column="id" property="id" jdbcType="BIGINT" />
+		<result column="project_name" property="projectName" jdbcType="VARCHAR" />
+		<result column="project_address" property="projectAddress" jdbcType="VARCHAR" />
+		<result column="estate_id" property="estateId" jdbcType="BIGINT" />
+		<result column="city_id" property="cityId" jdbcType="INTEGER" />
+		<result column="cs_project_id" property="csProjectId" jdbcType="BIGINT" />
+		<result column="table_name" property="tableName" jdbcType="VARCHAR" />
+		<result column="estate_name" property="estateName" jdbcType="VARCHAR" />
+		<result column="pump_temperature_max" property="pumpTemperatureMax" jdbcType="DOUBLE" />
+	</resultMap>
+	
+	<select id="queryById" resultMap="BaseProject">
+		select * from t_project where id=#{id}
+	</select>
+	
+	
+	
+	<!-- 查询项目  -->
+	<select id="findProject" resultMap="BaseProject" parameterType="HashMap">
+		select p.*,e.`estate_name`, c.table_name from t_project p,t_estate e,t_cs_project c ,
+			t_company c1,t_office o,`t_water_work` w,citys c2
+		<where>
+				c1.`id`=o.`company_id` AND 
+				o.`id` = w.`office_id` AND 
+				w.`id` = e.`water_work_id` AND 
+				e.`id` = p.`estate_id`  AND 
+			 	c.id = p.cs_project_id
+			 	<if test="userType == 1">
+					<!-- 片区公司员工 -->
+					AND c1.`id` = #{objectId} 
+				</if>
+				<if test="userType == 2">
+					<!-- 办事处员工 -->
+				 	AND	 o.`id` = #{objectId}
+				</if>
+				<if test="userType == 3">
+					<!-- 水厂员工 -->
+					AND w.`id` = #{objectId}
+				</if>
+				<if test="userType == 4">
+					<!-- 物业员工 -->
+					AND e.`id` = #{objectId}
+				</if>
+				<if test="parentIds != null">
+					AND p.`city_id` in 
+					<foreach collection="parentIds" item="parentId" open="(" close=")"
+					    separator=",">
+					    #{parentId}
+			    	</foreach>
+				</if>
+				<if test="parentIds == null">
+					AND p.`city_id` = c2.id
+				</if>
+			<if test="id != null">
+				AND p.`id` = #{id}
+			</if>
+			<if test="tableName != null">
+				AND c.table_name = #{tableName}
+			</if>
+			<if test="projectName != null and projectName != ''">
+				AND p.`project_name`LIKE '%${projectName}%'
+			</if>
+			<if test="projectAddress != null and projectAddress != ''">
+				AND p.`project_address`LIKE '%${projectAddress}%'
+			</if>
+			<if test="cs_project_id != null ">
+				AND p.`csProjectId` = #{csProjectId}
+			</if>
+			<if test="estateId != null">
+				AND p.`cs_project_id` = #{estateId}
+			</if>
+		</where>
+		<if test="pageSize != null">
+			LIMIT #{pageStart}, #{pageSize}
+		</if>
+	</select>
+	<!-- 添加项目 -->
+	<insert id="addProject" parameterType="ProjectBean">
+		<selectKey resultType="java.lang.Integer" order="AFTER"
+			keyProperty="id">
+			SELECT LAST_INSERT_ID() AS ID
+		</selectKey>
+		insert into t_project (project_name, project_address,
+		estate_id, cs_project_id,pump_temperature_max,city_id)
+		values (#{projectName,jdbcType=VARCHAR}, #{projectAddress,jdbcType=VARCHAR},
+		#{estateId,jdbcType=BIGINT}, #{csProjectId,jdbcType=VARCHAR},#{pumpTemperatureMax},#{cityId})
+	</insert>
+
+	<!-- 更新项目 -->
+	<update id="updProject" parameterType="ProjectBean">
+		update t_project
+		<set>
+			<if test="projectName != null">
+				project_name = #{projectName,jdbcType=VARCHAR},
+			</if>
+			<if test="projectAddress != null">
+				project_address = #{projectAddress,jdbcType=VARCHAR},
+			</if>
+			<if test="estateId != null">
+				estate_id = #{estateId,jdbcType=BIGINT},
+			</if>
+			<if test="csProjectId != null">
+				cs_project_id = #{csProjectId,jdbcType=VARCHAR},
+			</if>
+			<if test="pumpTemperatureMax != null">
+				pump_temperature_max = #{pumpTemperatureMax},
+			</if>
+			<if test="cityId != null">
+				city_id = #{cityId},
+			</if>
+		</set>
+		where id = #{id,jdbcType=BIGINT}
+	</update>
+	
+	
+	<select id="findProjectApp" resultMap="BaseProject">
+	SELECT p.*,cs.`table_name` FROM 
+		t_project p,t_company c1,t_office o,t_estate e ,`t_water_work` w,citys c2,`t_cs_project` cs
+	WHERE 
+		c1.`id`=o.`company_id` AND 
+		o.`id` = w.`office_id` AND 
+		w.`id` = e.`water_work_id` AND   
+		cs.`id` = p.`cs_project_id` AND
+		e.`id` = p.`estate_id`  
+		<if test="userType == 1">
+			<!-- 片区公司员工 -->
+			AND	c1.`id` = #{objectId} 
+		</if>
+		<if test="userType == 2">
+			<!-- 办事处员工 -->
+		 	AND	o.`id` = #{objectId}
+		</if>
+		<if test="userType == 3">
+			<!-- 水厂员工 -->
+			AND w.`id` = #{objectId}
+		</if>
+		<if test="userType == 4">
+			<!-- 物业员工 -->
+			AND e.`id` = #{objectId}
+		</if>
+		<if test="parentIds != null">
+			AND p.`city_id` in 
+			<foreach collection="parentIds" item="parentId" open="(" close=")"
+			    separator=",">
+			    #{parentId}
+	    	</foreach>
+		</if>
+		<if test="parentIds == null">
+			AND c2.`id` = p.`city_id`
+		</if>
+    	<if test="projectName != null and projectName != ''">
+			AND p.project_name LIKE '%${projectName}%'
+		</if>
+		group by p.id
+    	<if test="pageSize != null and pageSize != ''">
+			LIMIT #{pageStart}, #{pageSize}
+		</if>
+	</select>
+	
+	<select id="queryProjectByItem" resultMap="BaseProject">
+	
+		SELECT * from t_project 
+		<where>
+		
+			<if test="userType == 1">
+				<!-- 片区公司员工 -->
+				estate_id IN (SELECT id FROM t_estate WHERE water_work_id IN (SELECT id FROM t_water_work WHERE office_id IN (SELECT id FROM t_office where company_id = #{unitId})))
+			</if>
+			<if test="userType == 2">
+				<!-- 办事处员工 -->
+				estate_id IN (SELECT id FROM t_estate WHERE water_work_id IN (SELECT id FROM t_water_work WHERE office_id =#{unitId}))
+			</if>
+			<if test="userType == 3">
+				<!-- 水厂员工 -->
+				estate_id IN (SELECT id FROM t_estate WHERE water_work_id =#{unitId})
+			</if>
+			<if test="userType == 4">
+				<!-- 物业员工 -->
+				estate_id =#{unitId}
+			</if>
+		
+		</where>
+		limit #{limit},#{limitSize}
+	</select>
+	
+	<!-- 删除项目 -->
+	<delete id="deleteProjectById">
+		DELETE FROM `t_project` WHERE id = #{id}
+	</delete>
+</mapper>

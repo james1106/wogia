@@ -1,0 +1,548 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.magic.wogia.mapper.IDeviceInformationMapper" >
+
+	 <resultMap id="BaseResultMap" type="com.magic.wogia.bean.DeviceInformationBean" >
+	    <id column="id" property="id" jdbcType="BIGINT" />
+	    <result column="area" property="area" jdbcType="VARCHAR" />
+	    <result column="total_build" property="totalBuild" jdbcType="INTEGER" />
+	    <result column="household_num" property="householdNum" jdbcType="INTEGER" />
+	    <result column="two_water_household_num" property="twoWaterHouseholdNum" jdbcType="INTEGER" />
+	    <result column="pump_house_address" property="pumpHouseAddress" jdbcType="VARCHAR" />
+	    <result column="two_water_source_id" property="twoWaterSourceId" jdbcType="BIGINT" />
+	    <result column="two_water_mode_id" property="twoWaterModeId" jdbcType="BIGINT" />
+	    <result column="manufacturer" property="manufacturer" jdbcType="VARCHAR" />
+	    <result column="manufacture_date" property="manufactureDate" jdbcType="TIMESTAMP" />
+	    <result column="inlet_pipe_lowest_pressure" property="inletPipeLowestPressure" jdbcType="VARCHAR" />
+	    <result column="inlet_pipe_peak_pressure" property="inletPipePeakPressure" jdbcType="VARCHAR" />
+	    <result column="municipal_district_caliber" property="municipalDistrictCaliber" jdbcType="VARCHAR" />
+	    <result column="start_floor" property="startFloor" jdbcType="INTEGER" />
+	    <result column="end_floor" property="endFloor" jdbcType="INTEGER" />
+	    <result column="water_ability" property="waterAbility" jdbcType="VARCHAR" />
+	    <result column="water_pressure" property="waterPressure" jdbcType="VARCHAR" />
+	    <result column="main_device_model" property="mainDeviceModel" jdbcType="VARCHAR" />
+	    <result column="assist_device_model" property="assistDeviceModel" jdbcType="VARCHAR" />
+	    <result column="pump_brand" property="pumpBrand" jdbcType="VARCHAR" />
+	    <result column="lift" property="lift" jdbcType="VARCHAR" />
+	    <result column="flow" property="flow" jdbcType="VARCHAR" />
+	    <result column="main_pump_motor" property="mainPumpMotor" jdbcType="VARCHAR" />
+	    <result column="assist_pump_motor" property="assistPumpMotor" jdbcType="VARCHAR" />
+	    <result column="platform_num" property="platformNum" jdbcType="VARCHAR" />
+	    <result column="control_cabinet_model" property="controlCabinetModel" jdbcType="VARCHAR" />
+	    <result column="surge_pump_model" property="surgePumpModel" jdbcType="VARCHAR" />
+	    <result column="surge_pump_pressure_level" property="surgePumpPressureLevel" jdbcType="VARCHAR" />
+	    <result column="inlet_main_nozzle_caliber" property="inletMainNozzleCaliber" jdbcType="VARCHAR" />
+	    <result column="inlet_assist_nozzle_caliber" property="inletAssistNozzleCaliber" jdbcType="VARCHAR" />
+	    <result column="effluent_main_nozzle_caliber" property="effluentMainNozzleCaliber" jdbcType="VARCHAR" />
+	    <result column="effluent_assist_nozzle_caliber" property="effluentAssistNozzleCaliber" jdbcType="VARCHAR" />
+	    <result column="import_main_tube_valve_type" property="importMainTubeValveType" jdbcType="VARCHAR" />
+	    <result column="water_sys_imgs" property="waterSysImgs" javaType="java.lang.String" />
+	    <result column="cabinet_circuit_imgs" property="cabinetCircuitImgs" javaType="java.lang.String" />
+	    <result column="assemble_imgs" property="assembleImgs" javaType="java.lang.String" />
+	    <result column="device_id" property="deviceId" jdbcType="BIGINT" />
+		<result column="device_name" property="deviceName" jdbcType="VARCHAR" />
+		<result column="project_name" property="projectName" jdbcType="VARCHAR" />
+		<result column="project_address" property="projectAddress" jdbcType="VARCHAR" />
+		<result column="real_name" property="projectLiablePerson" jdbcType="VARCHAR" />
+		<result column="mobile" property="liablePersonMobile" jdbcType="VARCHAR" />
+		<result column="water_user_id" property="administratorId" jdbcType="BIGINT" />
+		<result column="project_user_id" property="projectLiablePersonId" jdbcType="BIGINT" />
+		<result column="device_valve_type" property="deviceValveType" jdbcType="VARCHAR" />
+		<result column="non_return_valve_type" property="nonReturnValveType" jdbcType="VARCHAR" />
+		<result column="water_id" property="superviseUnitId" jdbcType="BIGINT" />
+		<result column="waterWork_name" property="superviseUnit" jdbcType="VARCHAR" />
+		<result column="address_describe" property="superviseAddress" jdbcType="VARCHAR" />
+		<result column="supplier" property="supplier" jdbcType="VARCHAR" />
+ 	</resultMap>
+	<select id="getTDeviceInformationList" resultMap="BaseResultMap"  parameterType="HashMap">
+		select
+			*
+		from
+			t_device_information A
+
+		<include refid="tDeviceInformationWhere"/>
+
+		order by 
+	        <if test="pageArgs.column != null and pageArgs.column != ''">
+	        	${pageArgs.column} ${pageArgs.order},
+	        </if>
+	        A.id desc
+	    limit #{pageArgs.pageStart}, #{pageArgs.pageSize}
+	</select>
+
+	<select id="getDeviceInformationListCount" resultType="int" parameterType="HashMap">
+		select
+		count(A.id)
+		from
+		t_device_information A
+
+		<include refid="tDeviceInformationWhere"/>
+	</select>
+
+	<sql id="tDeviceInformationWhere">
+		<where>
+
+			<if test="area != null and area != ''">
+				and A.area like #{area}	
+			</if>
+
+			<if test="totalBuild != null and totalBuild != ''">
+				and A.total_build=#{totalBuild}	
+			</if>
+
+			<if test="householdNum != null and householdNum != ''">
+				and A.household_num=#{householdNum}	
+			</if>
+
+			<if test="twoWaterHouseholdNum != null and twoWaterHouseholdNum != ''">
+				and A.two_water_household_num=#{twoWaterHouseholdNum}	
+			</if>
+
+			<if test="pumpHouseAddress != null and pumpHouseAddress != ''">
+				and A.pump_house_address like #{pumpHouseAddress}	
+			</if>
+
+			<if test="twoWaterSource != null and twoWaterSource != ''">
+				and A.two_water_source like #{twoWaterSource}	
+			</if>
+
+			<if test="twoWaterMode != null and twoWaterMode != ''">
+				and A.two_water_mode like #{twoWaterMode}	
+			</if>
+
+			<if test="manufacturer != null and manufacturer != ''">
+				and A.manufacturer like #{manufacturer}	
+			</if>
+
+			<if test="manufactureDate != null and manufactureDate != ''">
+				and A.manufacture_date=#{manufactureDate}	
+			</if>
+
+			<if test="inletPipeLowestPressure != null and inletPipeLowestPressure != ''">
+				and A.inlet_pipe_lowest_pressure like #{inletPipeLowestPressure}	
+			</if>
+
+			<if test="inletPipePeakPressure != null and inletPipePeakPressure != ''">
+				and A.inlet_pipe_peak_pressure like #{inletPipePeakPressure}	
+			</if>
+
+			<if test="municipalDistrictCaliber != null and municipalDistrictCaliber != ''">
+				and A.municipal_district_caliber like #{municipalDistrictCaliber}	
+			</if>
+
+			<if test="waterSysImgs != null and waterSysImgs != ''">
+				and A.water_sys_imgs like #{waterSysImgs}	
+			</if>
+
+			<if test="startFloor != null and startFloor != ''">
+				and A.start_floor=#{startFloor}	
+			</if>
+
+			<if test="endFloor != null and endFloor != ''">
+				and A.end_floor=#{endFloor}	
+			</if>
+
+			<if test="waterAbility != null and waterAbility != ''">
+				and A.water_ability like #{waterAbility}	
+			</if>
+
+			<if test="waterPressure != null and waterPressure != ''">
+				and A.water_pressure like #{waterPressure}	
+			</if>
+
+			<if test="mainDeviceModel != null and mainDeviceModel != ''">
+				and A.main_device_model like #{mainDeviceModel}	
+			</if>
+
+			<if test="assistDeviceModel != null and assistDeviceModel != ''">
+				and A.assist_device_model like #{assistDeviceModel}	
+			</if>
+
+			<if test="pumpBrand != null and pumpBrand != ''">
+				and A.pump_brand like #{pumpBrand}	
+			</if>
+
+			<if test="lift != null and lift != ''">
+				and A.lift like #{lift}	
+			</if>
+
+			<if test="flow != null and flow != ''">
+				and A.flow like #{flow}	
+			</if>
+
+			<if test="mainPumpMotor != null and mainPumpMotor != ''">
+				and A.main_pump_motor like #{mainPumpMotor}	
+			</if>
+
+			<if test="assistPumpMotor != null and assistPumpMotor != ''">
+				and A.assist_pump_motor like #{assistPumpMotor}	
+			</if>
+
+			<if test="platformNum != null and platformNum != ''">
+				and A.platform_num like #{platformNum}	
+			</if>
+
+			<if test="controlCabinetModel != null and controlCabinetModel != ''">
+				and A.control_cabinet_model like #{controlCabinetModel}	
+			</if>
+
+			<if test="cabinetCircuitImgs != null and cabinetCircuitImgs != ''">
+				and A.cabinet_circuit_imgs like #{cabinetCircuitImgs}	
+			</if>
+
+			<if test="surgePumpModel != null and surgePumpModel != ''">
+				and A.surge_pump_model like #{surgePumpModel}	
+			</if>
+
+			<if test="surgePumpPressureLevel != null and surgePumpPressureLevel != ''">
+				and A.surge_pump_pressure_level like #{surgePumpPressureLevel}	
+			</if>
+
+			<if test="inletMainNozzleCaliber != null and inletMainNozzleCaliber != ''">
+				and A.inlet_main_nozzle_caliber like #{inletMainNozzleCaliber}	
+			</if>
+
+			<if test="inletAssistNozzleCaliber != null and inletAssistNozzleCaliber != ''">
+				and A.inlet_assist_nozzle_caliber like #{inletAssistNozzleCaliber}	
+			</if>
+
+			<if test="effluentMainNozzleCaliber != null and effluentMainNozzleCaliber != ''">
+				and A.effluent_main_nozzle_caliber like #{effluentMainNozzleCaliber}	
+			</if>
+
+			<if test="effluentAssistNozzleCaliber != null and effluentAssistNozzleCaliber != ''">
+				and A.effluent_assist_nozzle_caliber like #{effluentAssistNozzleCaliber}	
+			</if>
+
+			<if test="importMainTubeValveType != null and importMainTubeValveType != ''">
+				and A.import_main_tube_valve_type like #{importMainTubeValveType}	
+			</if>
+
+			<if test="assembleImgs != null and assembleImgs != ''">
+				and A.assemble_imgs like #{assembleImgs}	
+			</if>
+
+			<if test="deviceId != null and deviceId != ''">
+				and A.device_id=#{deviceId}	
+			</if>
+			<if test="supplier != null and supplier != ''">
+				and A.supplier=#{supplier}	
+			</if>
+			
+		</where>
+	</sql>
+
+	<delete id="deleteTDeviceInformation" parameterType="String" >
+		delete from t_device_information where id=#{value}
+	</delete>
+
+	<!-- 添加泵站信息 -->
+	<insert id="addDeviceInformation" parameterType="DeviceInformationBean" useGeneratedKeys="true" keyProperty="id">
+		insert into t_device_information(
+			area,
+			total_build,
+			household_num,
+			two_water_household_num,
+			pump_house_address,
+			two_water_source_id,
+			two_water_mode_id,
+			manufacturer,
+			manufacture_date,
+			inlet_pipe_lowest_pressure,
+			inlet_pipe_peak_pressure,
+			municipal_district_caliber,
+			water_sys_imgs,
+			start_floor,
+			end_floor,
+			water_ability,
+			water_pressure,
+			main_device_model,
+			assist_device_model,
+			pump_brand,
+			lift,
+			flow,
+			main_pump_motor,
+			assist_pump_motor,
+			platform_num,
+			control_cabinet_model,
+			cabinet_circuit_imgs,
+			surge_pump_model,
+			surge_pump_pressure_level,
+			inlet_main_nozzle_caliber,
+			inlet_assist_nozzle_caliber,
+			effluent_main_nozzle_caliber,
+			effluent_assist_nozzle_caliber,
+			import_main_tube_valve_type,
+			assemble_imgs,
+			device_id,
+			project_user_id,
+			water_user_id,
+			device_valve_type,
+			non_return_valve_type,
+			water_id,supplier)
+		 values(
+			#{area},
+			#{totalBuild},
+			#{householdNum},
+			#{twoWaterHouseholdNum},
+			#{pumpHouseAddress},
+			#{twoWaterSourceId},
+			#{twoWaterModeId},
+			#{manufacturer},
+			<choose>
+				<when test="manufactureDate != null and manufactureDate != ''">
+				#{manufactureDate},
+				</when>
+				<otherwise>
+				NULL,
+				</otherwise>
+			</choose>
+			#{inletPipeLowestPressure},
+			#{inletPipePeakPressure},
+			#{municipalDistrictCaliber},
+			#{waterSysImgs},
+			#{startFloor},
+			#{endFloor},
+			#{waterAbility},
+			#{waterPressure},
+			#{mainDeviceModel},
+			#{assistDeviceModel},
+			#{pumpBrand},
+			#{lift},
+			#{flow},
+			#{mainPumpMotor},
+			#{assistPumpMotor},
+			#{platformNum},
+			#{controlCabinetModel},
+			#{cabinetCircuitImgs},
+			#{surgePumpModel},
+			#{surgePumpPressureLevel},
+			#{inletMainNozzleCaliber},
+			#{inletAssistNozzleCaliber},
+			#{effluentMainNozzleCaliber},
+			#{effluentAssistNozzleCaliber},
+			#{importMainTubeValveType},
+			#{assembleImgs},
+			#{deviceId},
+			#{projectLiablePersonId},
+			#{administratorId},
+			#{deviceValveType},
+			#{nonReturnValveType},
+			#{superviseUnitId},
+			#{supplier}
+		)
+	</insert>
+
+	<update id="updateTDeviceInformation" parameterType="DeviceInformationBean">
+		update t_device_information
+		<set> 
+			area=#{area},
+			total_build=#{totalBuild},
+			household_num=#{householdNum},
+			two_water_household_num=#{twoWaterHouseholdNum},
+			pump_house_address=#{pumpHouseAddress},
+			two_water_source_id=#{twoWaterSourceId},
+			two_water_mode_id=#{twoWaterModeId},
+			manufacturer=#{manufacturer},
+			<choose>
+				<when test="manufactureDate != null and manufactureDate != ''">
+				manufacture_date=#{manufactureDate},
+				</when>
+				<otherwise>
+				manufacture_date=NULL,
+				</otherwise>
+			</choose>
+			inlet_pipe_lowest_pressure=#{inletPipeLowestPressure},
+			inlet_pipe_peak_pressure=#{inletPipePeakPressure},
+			municipal_district_caliber=#{municipalDistrictCaliber},
+			water_sys_imgs=#{waterSysImgs},
+			start_floor=#{startFloor},
+			end_floor=#{endFloor},
+			water_ability=#{waterAbility},
+			water_pressure=#{waterPressure},
+			main_device_model=#{mainDeviceModel},
+			assist_device_model=#{assistDeviceModel},
+			pump_brand=#{pumpBrand},
+			lift=#{lift},
+			flow=#{flow},
+			main_pump_motor=#{mainPumpMotor},
+			assist_pump_motor=#{assistPumpMotor},
+			platform_num=#{platformNum},
+			control_cabinet_model=#{controlCabinetModel},
+			cabinet_circuit_imgs=#{cabinetCircuitImgs},
+			surge_pump_model=#{surgePumpModel},
+			surge_pump_pressure_level=#{surgePumpPressureLevel},
+			inlet_main_nozzle_caliber=#{inletMainNozzleCaliber},
+			inlet_assist_nozzle_caliber=#{inletAssistNozzleCaliber},
+			effluent_main_nozzle_caliber=#{effluentMainNozzleCaliber},
+			effluent_assist_nozzle_caliber=#{effluentAssistNozzleCaliber},
+			import_main_tube_valve_type=#{importMainTubeValveType},
+			assemble_imgs=#{assembleImgs},
+			project_user_id=#{projectLiablePersonId},
+			water_user_id=#{administratorId},
+			device_valve_type=#{deviceValveType},
+			non_return_valve_type=#{nonReturnValveType},
+			water_id=#{superviseUnitId},
+			supplier=#{supplier}
+		</set>
+		 where device_id = #{deviceId}
+	</update>
+
+	<!-- 查询详细设备信息 -->
+	<select id="findDeviceInformationByDeviceId" resultMap="BaseResultMap" parameterType="Integer">
+		SELECT i.*,w.*,p.*,u.*,d.*,
+		(SELECT wa1.waterWork_name FROM t_water_work wa1 WHERE wa1.`id` = i.`two_water_source_id`) AS twoWaterSource,
+		(SELECT wa1.waterWork_name FROM t_water_work wa1 WHERE wa1.`id` = i.`two_water_mode_id`) AS twoWaterMode,
+		(SELECT u1.real_name FROM t_user u1 WHERE u1.`id` = i.`water_user_id`) AS administrator,
+		(SELECT u1.mobile FROM t_user u1 WHERE u1.`id` = i.`water_user_id`) AS administratorMobile
+		FROM t_device_information i,t_device d,t_project p,t_water_work w,t_user u
+		<where>
+		i.`device_id` = d.`id` AND
+			d.`project_id` = p.`id` AND
+			w.`id` = i.`water_id` AND
+			u.`id` = i.`project_user_id` AND
+			i.`device_id`=#{deviceId}
+		</where>
+	</select>
+
+	<!-- 更新设备信息 -->
+	  <update id="updDeviceInformation" parameterType="com.magic.wogia.bean.DeviceInformationBean" >
+	    update t_device_information
+	    <set >
+	      <if test="area != null" >
+	        area = #{area,jdbcType=VARCHAR},
+	      </if>
+	      <if test="totalBuild != null" >
+	        total_build = #{totalBuild,jdbcType=INTEGER},
+	      </if>
+	      <if test="householdNum != null" >
+	        household_num = #{householdNum,jdbcType=INTEGER},
+	      </if>
+	      <if test="twoWaterHouseholdNum != null" >
+	        two_water_household_num = #{twoWaterHouseholdNum,jdbcType=INTEGER},
+	      </if>
+	      <if test="pumpHouseAddress != null" >
+	        pump_house_address = #{pumpHouseAddress,jdbcType=VARCHAR},
+	      </if>
+	      <if test="twoWaterSource != null" >
+	        two_water_source = #{twoWaterSource,jdbcType=VARCHAR},
+	      </if>
+	      <if test="twoWaterMode != null" >
+	        two_water_mode = #{twoWaterMode,jdbcType=VARCHAR},
+	      </if>
+	      <if test="manufacturer != null" >
+	        manufacturer = #{manufacturer,jdbcType=VARCHAR},
+	      </if>
+	      <if test="manufactureDate != null" >
+	        manufacture_date = #{manufactureDate,jdbcType=TIMESTAMP},
+	      </if>
+	      <if test="inletPipeLowestPressure != null" >
+	        inlet_pipe_lowest_pressure = #{inletPipeLowestPressure,jdbcType=VARCHAR},
+	      </if>
+	      <if test="inletPipePeakPressure != null" >
+	        inlet_pipe_peak_pressure = #{inletPipePeakPressure,jdbcType=VARCHAR},
+	      </if>
+	      <if test="municipalDistrictCaliber != null" >
+	        municipal_district_caliber = #{municipalDistrictCaliber,jdbcType=VARCHAR},
+	      </if>
+	      <if test="startFloor != null" >
+	        start_floor = #{startFloor,jdbcType=INTEGER},
+	      </if>
+	      <if test="endFloor != null" >
+	        end_floor = #{endFloor,jdbcType=INTEGER},
+	      </if>
+	      <if test="waterAbility != null" >
+	        water_ability = #{waterAbility,jdbcType=VARCHAR},
+	      </if>
+	      <if test="waterPressure != null" >
+	        water_pressure = #{waterPressure,jdbcType=VARCHAR},
+	      </if>
+	      <if test="mainDeviceModel != null" >
+	        main_device_model = #{mainDeviceModel,jdbcType=VARCHAR},
+	      </if>
+	      <if test="assistDeviceModel != null" >
+	        assist_device_model = #{assistDeviceModel,jdbcType=VARCHAR},
+	      </if>
+	      <if test="pumpBrand != null" >
+	        pump_brand = #{pumpBrand,jdbcType=VARCHAR},
+	      </if>
+	      <if test="lift != null" >
+	        lift = #{lift,jdbcType=VARCHAR},
+	      </if>
+	      <if test="flow != null" >
+	        flow = #{flow,jdbcType=VARCHAR},
+	      </if>
+	      <if test="mainPumpMotor != null" >
+	        main_pump_motor = #{mainPumpMotor,jdbcType=VARCHAR},
+	      </if>
+	      <if test="assistPumpMotor != null" >
+	        assist_pump_motor = #{assistPumpMotor,jdbcType=VARCHAR},
+	      </if>
+	      <if test="platformNum != null" >
+	        platform_num = #{platformNum,jdbcType=VARCHAR},
+	      </if>
+	      <if test="controlCabinetModel != null" >
+	        control_cabinet_model = #{controlCabinetModel,jdbcType=VARCHAR},
+	      </if>
+	      <if test="surgePumpModel != null" >
+	        surge_pump_model = #{surgePumpModel,jdbcType=VARCHAR},
+	      </if>
+	      <if test="surgePumpPressureLevel != null" >
+	        surge_pump_pressure_level = #{surgePumpPressureLevel,jdbcType=VARCHAR},
+	      </if>
+	      <if test="inletMainNozzleCaliber != null" >
+	        inlet_main_nozzle_caliber = #{inletMainNozzleCaliber,jdbcType=VARCHAR},
+	      </if>
+	      <if test="inletAssistNozzleCaliber != null" >
+	        inlet_assist_nozzle_caliber = #{inletAssistNozzleCaliber,jdbcType=VARCHAR},
+	      </if>
+	      <if test="effluentMainNozzleCaliber != null" >
+	        effluent_main_nozzle_caliber = #{effluentMainNozzleCaliber,jdbcType=VARCHAR},
+	      </if>
+	      <if test="effluentAssistNozzleCaliber != null" >
+	        effluent_assist_nozzle_caliber = #{effluentAssistNozzleCaliber,jdbcType=VARCHAR},
+	      </if>
+	      <if test="importMainTubeValveType != null" >
+	        import_main_tube_valve_type = #{importMainTubeValveType,jdbcType=VARCHAR},
+	      </if><!-- 
+	      <if test="deviceId != null" >
+	        device_id = #{deviceId,jdbcType=BIGINT},
+	      </if> -->
+	      <if test="waterSysImgs != null" >
+	        water_sys_imgs = #{waterSysImgs},
+	      </if>
+	      <if test="cabinetCircuitImgs != null" >
+	        cabinet_circuit_imgs = #{cabinetCircuitImgs},
+	      </if>
+	      <if test="assembleImgs != null" >
+	        assemble_imgs = #{assembleImgs},
+	      </if>
+	      <if test="projectLiablePerson != null" >
+	        project_liable_person=#{projectLiablePerson},
+	      </if>
+	      <if test="liablePersonMobile != null" >
+	        liable_person_mobile=#{liablePersonMobile},
+	      </if>
+	      <if test="administrator != null" >
+	        administrator=#{administrator},
+	      </if>
+	      <if test="deviceValveType != null" >
+	        device_valve_type=#{deviceValveType},
+	      </if>
+		  <if test="superviseAddress != null" >
+	        non_return_valve_type =#{superviseAddress},	
+	      </if>
+	      <if test="supplier != null">
+	     	supplier = #{supplier}
+	      </if>
+	    </set>
+	    where device_id = #{deviceId}
+ 	</update>
+
+	<!-- 删除泵站信息 -->
+	<delete id="deleteByProjectId">
+		DELETE FROM `t_device_information` WHERE `device_id` 
+		IN(SELECT id FROM  `t_device` d WHERE d.`project_id` = #{projectId})
+	</delete>
+
+</mapper>

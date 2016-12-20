@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.magic.wogia.mapper.IOfficeMapper" >
+	
+	<resultMap type="OfficeBean" id="BaseOffice">
+		<result column="id" property="id"  javaType="java.lang.Integer"/>
+		<result column="office_name" property="officeName"  javaType="java.lang.String"/>
+		<result column="office_address" property="officeAddress"  javaType="java.lang.String"/>
+		<result column="company_id" property="companyId"  javaType="java.lang.Integer"/>
+		<result column="state" property="state" javaType="java.lang.Integer" />
+		<result column="number" property="number" javaType="java.lang.String" />
+		<result column="company_name" property="companyName" javaType="java.lang.String" />
+	</resultMap>
+
+	<!-- 查询 -->
+	<select id="findOffice" resultMap="BaseOffice" parameterType="HashMap">
+		SELECT * FROM `t_office` o ,t_company c
+		<where> 
+			c.id = o.company_id
+			<if test="id != null">
+				AND o.`id` = #{id} 
+			</if>
+			<if test="officeName != null and officeName != ''">
+				AND o.`office_name`LIKE '%${officeName}%'
+			</if>
+			<if test="officeAddress != null and officeAddress != ''">
+				AND o.`office_address` LIKE '%${officeAddress}%'
+			</if>
+			<if test="companyId != null">
+				AND o.`company_id` = #{companyId}
+			</if>
+			<if test="number != null and number != ''">
+				AND o.`number` = #{number}
+			</if>
+		</where>
+		<if test="pageStart != null">
+			LIMIT #{pageStart}, #{pageSize}
+		</if>
+	</select>
+	
+	<!-- 新增办事处 -->
+	<insert id="addOffice" parameterType="OfficeBean">
+		<selectKey resultType="java.lang.Integer" order="AFTER"
+			keyProperty="id">
+			SELECT LAST_INSERT_ID() AS ID
+		</selectKey>
+		INSERT INTO `t_office`(`office_name`,`office_address`,`company_id`,`number`) 
+		VALUES(#{officeName},#{officeAddress},#{companyId},#{number})
+	</insert>
+	
+	<!-- 更新办事处信息 -->
+	<update id="updOffice" parameterType="OfficeBean">
+		UPDATE `t_office`
+		<set>
+			 <if test="officeName != null and officeName != ''">
+				 `office_name`= #{officeName},
+			 </if>
+			 <if test="officeAddress != null and officeAddress != ''">
+				 `office_address` = #{officeAddress},
+			 </if>
+			 <if test="companyId != null and companyId != ''">
+				 `company_id` = #{companyId},
+			 </if>
+			 <if test="state != null">
+		      	state = #{state},
+		     </if>
+			 <if test="number != null">
+		      	number = #{number},
+		     </if>
+		</set>
+		WHERE id = #{id}
+	</update>
+	
+	<!-- 删除办事处  -->
+	<delete id="delOffice">
+		DELETE FROM t_office
+   		<where>
+	   		<if test="id != null">
+	   			id = #{id}
+	   		</if>
+	   		<if test="companyId != null">
+	   		 	AND `company_id` = #{companyId}
+	   		</if>
+   		</where>
+   		
+	</delete>
+	
+	<select id="queryById" resultMap="BaseOffice">
+		select * from t_office where id=#{id}
+	</select>
+	
+</mapper>

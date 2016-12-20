@@ -1,0 +1,366 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.magic.wogia.mapper.IUserMapper" >
+	
+	<resultMap type="UserBean" id="BaseUser">
+		<result column="id" property="id"  javaType="java.lang.Integer"/>
+		<result column="updatetime" property="updatetime"  javaType="java.util.Date"/>
+		<result column="createtime" property="createtime"  javaType="java.util.Date"/>
+		<result column="real_name" property="realName"  javaType="java.lang.String"/>
+		<result column="pwd" property="pwd"  javaType="java.lang.String"/>
+		<result column="email" property="email"  javaType="java.lang.String"/>
+		<result column="mobile" property="mobile"  javaType="java.lang.String"/>
+		<result column="qq" property="qq"  javaType="java.lang.String"/>
+		<result column="avatar" property="avatar"  javaType="java.lang.String"/>
+		<result column="role_id" property="roleId"  javaType="java.lang.Integer"/>
+		<result column="role" property="roleName"  javaType="java.lang.String"/>
+		<result column="status" property="status"  javaType="java.lang.Integer"/>
+		<result column="token" property="token"  javaType="java.lang.String"/>
+		<result column="unit_id" property="companyId"  javaType="java.lang.Integer"/>
+		<result column="deviceType" property="deviceType"  javaType="java.lang.Integer"/>
+		<result column="deviceToken" property="deviceToken"  javaType="java.lang.String"/>
+		<result column="gender" property="gender"  javaType="java.lang.Integer"/>
+		<result column="job_number" property="jobNumber"  javaType="java.lang.String"/>
+		<result column="job_title" property="jobTitle"  javaType="java.lang.String"/>
+		<result column="user_name" property="userName" javaType="java.lang.String"/>
+		<result column="companyName" property="companyName" javaType="java.lang.String"/>
+		<result column="silence" property="silence" javaType="java.lang.Integer"/>
+		<result column="projectIds" property="projectIds" javaType="java.lang.String"/>
+		<result column="deviceIds" property="deviceIds" javaType="java.lang.String"/>
+		<result column="comIds" property="comIds" javaType="java.lang.String"/>
+		<result column="projectName" property="projectName" javaType="java.lang.String"/>
+		<result column="componetName" property="componetName" javaType="java.lang.String"/>
+		<result column="deviceName" property="deviceName" javaType="java.lang.String"/>
+		<association property="project" column="pId" select="com.magic.wogia.mapper.IProjectMapper.queryById"></association>
+	</resultMap>
+	
+	<select id="queryByMobile" resultMap="BaseUser">
+		select id,mobile from t_user where mobile=#{mobile}
+	</select>
+	
+	<select id="queryEstateUseAndProject" resultMap="BaseUser">
+		SELECT p.id as pId,u.id,u.silence,u.deviceToken,u.deviceType from t_project p,t_user u ,t_estate e,t_device d,t_component_device com 
+		WHERE d.id=com.device_id and d.project_id=p.id and e.id=p.estate_id and u.unit_id=e.id AND u.role_id=7 and u.id in 
+			<foreach collection="userIds" item="id" index="index" separator="," close=")" open="(">
+		 		#{id}
+		 	</foreach>
+		 AND com.id IN
+			<foreach collection="comIds" item="id" index="index" separator="," close=")" open="(">
+		 		#{id}
+		 	</foreach>
+	</select>
+	
+	
+	<select id="queryWaterUseAndProject" resultMap="BaseUser">
+		SELECT p.id as pId,u.id,u.silence,u.deviceToken,u.deviceType from t_project p,t_user u ,t_estate e,t_device d,t_component_device com ,t_water_work wo
+		WHERE wo.id=e.water_work_id and d.id=com.device_id and d.project_id=p.id and e.id=p.estate_id and u.unit_id=wo.id AND u.role_id=6 and u.id in
+			<foreach collection="userIds" item="id" index="index" separator="," close=")"  open="(">
+		 		#{id}
+		 	</foreach>
+		 AND com.id IN
+			<foreach collection="comIds" item="id" index="index" separator="," close=")"  open="(">
+		 		#{id}
+		 	</foreach>
+	</select>
+	
+	<select id="queryEstateUserByDeviceId" resultMap="BaseUser">
+	
+		SELECT u.id,u.real_name,u.deviceToken,u.deviceType,GROUP_CONCAT(DISTINCT(p.id)) as projectIds,GROUP_CONCAT(DISTINCT(d.id)) as deviceIds,GROUP_CONCAT(DISTINCT(com.id)) as comIds,
+		GROUP_CONCAT(DISTINCT(p.project_name)) as projectName,GROUP_CONCAT(DISTINCT(com.component_name))as componetName ,GROUP_CONCAT(DISTINCT(d.device_name))as deviceName from t_user u,t_estate e,t_project p,t_device d,t_component_device c ,
+		t_component com  WHERE u.unit_id=e.id and u.role_id=7 AND p.estate_id=e.id AND d.project_id=p.id AND com.id=c.component_id and c.device_id=d.id AND c.id IN 
+			
+			<foreach collection="comIds" item="id" index="index" separator="," close=")" open="(">
+		 		#{id}
+		 	</foreach>
+	  GROUP BY u.id
+	</select>
+	<select id="queryWaterUserByDeviceId" resultMap="BaseUser">
+	
+		SELECT u.id,u.real_name,u.deviceToken,u.deviceType,GROUP_CONCAT(DISTINCT(p.id)) as projectIds,GROUP_CONCAT(DISTINCT(d.id)) as deviceIds,GROUP_CONCAT(DISTINCT(com.id)) as comIds,
+		GROUP_CONCAT(DISTINCT(p.project_name)) as projectName,GROUP_CONCAT(DISTINCT (com.component_name))as componetName ,GROUP_CONCAT(DISTINCT(d.device_name))as deviceName 
+	   from t_user u,t_estate e,t_project p,t_device d,t_component_device c ,t_component com,t_water_work wo  WHERE wo.id=e.water_work_id and u.unit_id=wo.id and u.role_id=6 AND 
+	   p.estate_id=e.id AND d.project_id=p.id AND com.id=c.component_id and c.device_id=d.id AND c.id IN 
+	
+		<foreach collection="comIds" item="id" index="index" separator="," close=")" open="(">
+		 		#{id}
+		 	</foreach>
+
+ 		GROUP BY u.id
+	
+		
+	</select>
+	
+	<select id="queryByOrderId" resultMap="BaseUser">
+		select * from t_user where id = (select create_user_id from t_order where id=#{orderId})
+	</select>
+	
+	<select id="queryTech" resultMap="BaseUser" >
+		select id,mobile,avatar,real_name from t_user where role_id=3 and `status`=1
+		<if test="userType != null and unitId != null">
+			<if test="userType == 3">
+				<!-- 水厂  -->
+				and unit_id = ( SELECT company_id from t_office where id = ( SELECT office_id from t_water_work where id =  
+				(SELECT unit_id from t_user where id = (SELECT create_user_id from t_order WHERE id=#{orderId}))))
+			</if>
+			<if test="userType == 4">
+				<!-- 物业 -->
+				and unit_id = ( SELECT company_id from t_office where id = ( SELECT office_id from t_water_work where id = 
+				( SELECT water_work_id from t_estate where id = (SELECT unit_id from t_user where id = (SELECT create_user_id from t_order WHERE id=#{orderId})))))
+			</if>
+		</if>
+	</select>
+	
+	<select id="queryByIdUserOrder" resultMap="BaseUser">
+		select id,mobile,avatar,real_name from t_user where id=#{userId}
+	</select>
+	
+	<select id="queryByUserName" resultMap="BaseUser">
+		select * from t_user where user_name=#{userName}
+	</select>
+
+	<!-- 根据条件查询用户 -->	
+	<select id="findUser" resultMap="BaseUser">
+		SELECT *,(SELECT cn.company_name FROM `t_company` cn 
+		WHERE cn.id = IF(u.`role_id` = 2 OR u.`role_id` = 3 OR u.`role_id` = 4,u.`unit_id`,
+		(SELECT of.company_id FROM t_office of WHERE of.id = IF(u.`role_id` = 5,u.`unit_id`,
+		(SELECT ww.office_id FROM `t_water_work` ww WHERE ww.id = IF(u.`role_id` = 6,u.`unit_id`,
+		(SELECT es.water_work_id FROM `t_estate` es WHERE es.id = IF(u.`role_id` = 7,u.`unit_id`,0)))))))) 
+		companyName FROM  t_user u,t_role r
+		<where>
+			r.id = u.role_id
+			<if test="userType == 1">
+				<!-- 片区公司员工 -->
+				AND (u.`role_id` = 5 AND u.`unit_id` IN(SELECT o.`id` FROM `t_office` o WHERE o.`company_id` = #{objectId}) OR
+				u.`role_id` = 6 AND u.`unit_id` IN(SELECT w.`id` FROM `t_water_work` w WHERE w.`office_id` IN
+				(SELECT o.`id` FROM `t_office` o WHERE o.`company_id` = #{objectId})) OR
+				u.`role_id` = 7 AND u.`unit_id` IN(SELECT e.`id` FROM `t_estate` e WHERE e.`water_work_id` IN
+				(SELECT w.`id` FROM `t_water_work` w WHERE w.`office_id` IN
+				(SELECT o.`id` FROM `t_office` o WHERE o.`company_id` = #{objectId}))) or u.id = #{id})
+				
+			</if>
+			<if test="userType == 2">
+				<!-- 办事处员工 -->
+				AND (u.`role_id` = 6 AND u.`unit_id` IN(SELECT w.`id` FROM `t_water_work` w WHERE w.`office_id` = #{objectId}) OR
+				u.`role_id` = 7 AND u.`unit_id` IN(SELECT e.`id` FROM `t_estate` e WHERE e.`water_work_id` IN
+				(SELECT w.`id` FROM `t_water_work` w WHERE w.`office_id` =  #{objectId}))or u.id = #{id})
+			</if>
+			<if test="userType == 3">
+				<!-- 水厂员工 -->
+				AND (u.`role_id` = 7 AND u.`unit_id` IN
+				(SELECT e.`id` FROM `t_estate` e WHERE e.`water_work_id` = #{objectId}) OR u.id = #{id})
+			</if>
+			<if test="userType == 4">
+				<!-- 物业员工 -->
+				AND u.id = #{id} 
+			</if>
+			<if test="id != null">
+				AND u.id = #{id} 
+			</if>
+			<if test="roleId != null">
+				AND u.role_id = #{roleId} 
+			</if>
+			<if test="jobNumber != null">
+				AND u.job_number = #{jobNumber} 
+			</if>
+			<if test="realName != null and realName != ''">
+				AND u.real_name LIKE '%${realName}%' 
+			</if>
+			<if test="mobile != null and mobile != ''">
+				AND u.mobile LIKE '%${mobile}%' 
+			</if>
+			<if test="userName != null and userName != ''">
+				AND u.user_name LIKE '%${userName}%'
+			</if>
+			<if test="account != null and account != ''">
+				AND (u.user_name = #{account} or u.mobile = #{account})
+			</if>
+		</where>
+		GROUP BY u.id
+		<if test="pageStart != null">
+			LIMIT #{pageStart}, #{pageSize}
+		</if>
+	</select>
+	
+	<!-- 查询联系人 -->
+	<select id="findContacts" resultMap="BaseUser" parameterType="HashMap">
+		SELECT u.id,u.mobile,u.id,u.real_name,u.user_name,u.avatar,u.`deviceType`,u.`deviceToken`,u.`silence`,
+		IF(u.`role_id` IN (2,3,4),c.`company_name`,
+		IF(u.`role_id`=5,o.`office_name`,
+		IF(u.`role_id`=6,w.`waterWork_name`,
+		IF(u.`role_id`=7,e.`estate_name`,'平台管理员')))) AS unitName 
+		FROM 
+		  `t_user` u,
+		  `t_estate` e LEFT JOIN `t_project` p  ON p.`estate_id` = e.`id` ,
+		  `t_water_work` w,
+		  `t_office` o,
+		  `t_company` c
+		  <where> 
+		   	  e.`water_work_id` = w.`id` 
+			  AND w.`office_id` = o.`id` 
+			  AND o.`company_id` = c.`id` 
+			  AND ((e.`id` = u.`unit_id` AND u.`role_id` = 7) OR 
+			   (w.`id` = u.`unit_id` AND u.`role_id` = 6)  OR 
+			   (o.`id` = u.`unit_id` AND u.`role_id` = 5 ) OR 
+  			   (c.`id` = u.`unit_id` AND u.`role_id` IN(2,3,4)) OR  u.`unit_id` = 0)
+		  <if test="userType == 1">
+				<!-- 片区公司员工 -->
+				 AND c.`id` = #{objectId}
+			</if>
+			<if test="userType == 2">
+				<!-- 办事处员工 -->
+				AND o.`id` = #{objectId}
+			</if>
+			<if test="userType == 3">
+				<!-- 水厂员工 -->
+				AND w.`id` = #{objectId}
+			</if>
+			<if test="userType == 4">
+				<!-- 物业员工 -->
+				AND e.`id` = #{objectId}
+			</if>
+			<if test="roleId != null">
+				AND u.`role_id` = #{roleId}
+			</if>
+			<if test="projectId != null">
+			 	AND p.`id` = #{projectId}
+			 </if>
+			 <if test="waterWorkId != null">
+			 	AND w.`id` = #{waterWorkId}
+			 	AND u.`role_id` = 6 
+			 </if>
+			 <if test="userId != null">
+			 	AND u.`id` not in(#{userId})
+			 </if>
+		</where>
+		GROUP BY u.`id` 
+	</select>
+	
+	
+	<!-- 添加用户 -->
+	<insert id="addUser" parameterType="UserBean">
+		<selectKey resultType="java.lang.Integer" order="AFTER"
+			keyProperty="id">
+			SELECT LAST_INSERT_ID() AS ID
+		</selectKey>
+		INSERT INTO t_user(`createtime`,`updatetime`,`mobile`,`pwd`,`role_id`,`unit_id`,`user_name`,`job_number`,`job_title`,`qq`,`real_name`,`email`) 
+		VALUES(NOW(),NOW(),#{mobile},#{pwd},#{roleId},#{companyId},#{userName},#{jobNumber},#{jobTitle},#{qq},#{realName},#{email})
+	</insert>
+	
+
+	
+	<select id="login" resultMap="BaseUser">
+		select * from t_user where  (mobile=#{mobile} or binary user_name=#{mobile})
+		<if test="password != null">
+			and pwd=#{password}
+		</if>
+	</select>
+	
+	<update id="updUser" parameterType="UserBean" >
+    update t_user
+    <set >
+      <if test="updatetime != null" >
+        updatetime = NOW(),
+      </if>
+      <if test="silence != null">
+      	`silence`=#{silence},
+      </if>
+      <if test="realName != null" >
+        real_name = #{realName,jdbcType=VARCHAR},
+      </if>
+      <if test="pwd != null" >
+        pwd = #{pwd,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null" >
+        email = #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="mobile != null" >
+        mobile = #{mobile,jdbcType=VARCHAR},
+      </if>
+      <if test="qq != null" >
+        qq = #{qq,jdbcType=VARCHAR},
+      </if>
+      <if test="avatar != null" >
+        avatar = #{avatar,jdbcType=VARCHAR},
+      </if>
+      <if test="roleId != null" >
+        role_id = #{roleId,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="companyId != null" >
+        unit_id = #{companyId,jdbcType=INTEGER},
+      </if>
+      <if test="deviceType != null" >
+        deviceType = #{deviceType,jdbcType=INTEGER},
+      </if>
+      <if test="deviceToken != null" >
+        deviceToken = #{deviceToken,jdbcType=VARCHAR},
+      </if>
+      <if test="gender != null" >
+        gender = #{gender,jdbcType=INTEGER},
+      </if>
+      <if test="jobNumber != null" >
+        job_number = #{jobNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="jobTitle != null" >
+        job_title = #{jobTitle,jdbcType=VARCHAR},
+      </if>
+      <if test="token != null" >
+        token = #{token,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  
+  <select id="countUser" resultType="java.lang.Integer">
+  	select count(*) from t_user where 1=1
+  	<if test="mobile != null">
+  		and mobile=#{mobile}
+  	</if>
+  	<if test="userName != null">
+  	 and user_name=#{userName}
+  	</if>
+  </select>
+  
+  
+  <select id="findAllToToken"  resultMap="BaseUser" >
+		select id,deviceToken,deviceType  from t_user
+  </select>
+  
+  <select id="queryUserByItem" resultMap="BaseUser">
+  	select  id,`silence`,deviceToken,deviceType from t_user where (role_id=#{roleId}
+	<if test="idType != null and unitId != null">
+		<if test="idType == 3">
+			AND unit_id =( SELECT company_id from t_office where id= (SELECT office_id from t_water_work where id= #{unitId}))
+		</if>
+		<if test="idType == 4">
+			 AND unit_id =( SELECT company_id from t_office where id= (SELECT office_id from t_water_work where id= (SELECT water_work_id from t_estate where id=#{unitId})))
+		</if>
+	</if>  
+	) or (role_id = 1)
+  </select>
+  
+  <select id="batchQueryUserToken" resultMap="BaseUser">
+  		select  id,deviceToken,deviceType,`silence`  from t_user where id in
+  		<foreach collection="ids" index="index" item="id" open="(" separator="," close=")" >
+  			#{id}
+  		</foreach>
+  </select>
+  
+  <select id="batchQueryUserInfo" resultMap="BaseUser">
+  
+  	select  id,user_name,real_name,avatar,mobile from t_user where binary user_name in
+  		<foreach collection="userNames" index="index" item="userName" open="(" separator="," close=")" >
+  			#{userName}
+  		</foreach>
+  </select>
+  
+  
+  
+  
+  
+  
+  
+</mapper>
